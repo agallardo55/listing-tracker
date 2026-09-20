@@ -194,11 +194,31 @@
 
   .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
   .theme-toggle { font-size: 18px; background: var(--surface-2); border-radius: 999px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .mobile-bottom-tabs { display: none; }
+  .timeline-list { display: grid; gap: 10px; }
+  .timeline-item { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--border); }
+  .timeline-item:first-child { border-top: none; }
+  .timeline-dot { width: 11px; height: 11px; border-radius: 999px; background: var(--accent); margin-top: 6px; }
+  .timeline-title { font-weight: 650; }
+  .timeline-date { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .vendor-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end; margin-top: 10px; }
 
   @media (max-width: 640px) {
+    #app { padding-bottom: 96px; }
     .listing-row { grid-template-columns: 1fr; gap: 8px; }
     .open-items { text-align: left; }
     .progress-wrap { min-width: 0; }
+    .desktop-only { display: none; }
+    .vendor-row { grid-template-columns: 1fr; }
+    .mobile-bottom-tabs {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      background: var(--surface); border-top: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .tab-btn { background: transparent; color: var(--muted); border-radius: 12px; padding: 8px 4px; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .tab-btn strong { font-size: 18px; line-height: 1; }
+    .tab-btn.active { background: var(--accent-soft); color: var(--accent); }
   }
 </style>
 </head>
@@ -300,9 +320,14 @@ function freshListing(overrides) {
     mls: "",
     listPrice: "",
     goLive: "",
+    openHouse1: "",
+    openHouse2: "",
+    mutualAcceptance: "",
+    appraisalDate: "",
     closingDate: "",
     stage: "Listing Signed",
     notes: "",
+    vendors: [],
     checklist: freshChecklist(),
   }, overrides || {});
 }
@@ -327,12 +352,30 @@ function loadState() {
   };
 }
 
+function migrateState(rawState) {
+  const next = rawState || {};
+  if (!next.teamName) next.teamName = "Your Real Estate Business";
+  if (next.theme !== "light" && next.theme !== "dark") next.theme = "light";
+  if (!next.view || !next.view.screen) next.view = { screen: "dashboard", listingId: null };
+  if (!Array.isArray(next.listings)) next.listings = [];
+  next.listings = next.listings.map(l => Object.assign({
+    id: uid(), property: "", seller: "", mls: "", listPrice: "",
+    goLive: "", openHouse1: "", openHouse2: "", mutualAcceptance: "", appraisalDate: "", closingDate: "",
+    stage: "Listing Signed", notes: "", vendors: [], checklist: freshChecklist(),
+  }, l, {
+    vendors: Array.isArray(l.vendors) ? l.vendors : [],
+    checklist: Array.isArray(l.checklist) ? l.checklist : freshChecklist(),
+  }));
+  return next;
+}
+
 function saveState() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
   catch (e) { console.error("Could not save:", e); }
 }
 
-let state = loadState();
+let state = migrateState(loadState());
+saveState();
 
 /* ---------- Derived helpers ---------- */
 function progress(listing) {
@@ -360,6 +403,12 @@ function render() {
   document.documentElement.setAttribute("data-theme", state.theme);
   if (state.view.screen === "detail") {
     app.innerHTML = renderDetail(state.listings.find(l => l.id === state.view.listingId));
+  } else if (state.view.screen === "checklist") {
+    app.innerHTML = renderChecklistScreen(state.listings.find(l => l.id === state.view.listingId));
+  } else if (state.view.screen === "timeline") {
+    app.innerHTML = renderTimeline(state.listings.find(l => l.id === state.view.listingId));
+  } else if (state.view.screen === "settings") {
+    app.innerHTML = renderSettings();
   } else {
     app.innerHTML = renderDashboard();
   }
@@ -413,14 +462,12 @@ function renderDashboard() {
       <button class="btn-primary" id="addListingBtn">+ New Listing</button>
     </div>
     ${body}
+    ${renderBottomTabs()}
   `;
 }
 
-function renderDetail(listing) {
-  if (!listing) { state.view = { screen: "dashboard", listingId: null }; return renderDashboard(); }
-  const p = progress(listing);
-
-  const sections = CHECKLIST_TEMPLATE.map(sec => {
+function renderChecklistSections(listing) {
+  return CHECKLIST_TEMPLATE.map(sec => {
     const tasks = listing.checklist.filter(t => t.section === sec.section);
     const done = tasks.filter(t => t.done).length;
     const rows = tasks.map(t => `
@@ -443,6 +490,22 @@ function renderDetail(listing) {
         <div class="task-list">${rows}</div>
       </div>`;
   }).join("");
+}
+
+function renderBottomTabs() {
+  const active = state.view.screen;
+  return `
+    <nav class="mobile-bottom-tabs" aria-label="Mobile navigation">
+      <button class="tab-btn ${active === "dashboard" ? "active" : ""}" data-tab="dashboard"><strong>🏠</strong>Dashboard</button>
+      <button class="tab-btn ${active === "checklist" ? "active" : ""}" data-tab="checklist"><strong>✅</strong>Checklist</button>
+      <button class="tab-btn ${active === "timeline" ? "active" : ""}" data-tab="timeline"><strong>📅</strong>Timeline</button>
+      <button class="tab-btn ${active === "settings" ? "active" : ""}" data-tab="settings"><strong>⚙️</strong>Settings</button>
+    </nav>`;
+}
+
+function renderDetail(listing) {
+  if (!listing) { state.view = { screen: "dashboard", listingId: null }; return renderDashboard(); }
+  const p = progress(listing);
 
   return `
     ${renderTopbar()}
@@ -454,6 +517,10 @@ function renderDetail(listing) {
         <div class="field"><label>MLS #</label><input id="f_mls" value="${esc(listing.mls)}" /></div>
         <div class="field"><label>List Price</label><input id="f_listPrice" value="${esc(listing.listPrice)}" /></div>
         <div class="field"><label>Go-Live Date</label><input id="f_goLive" value="${esc(listing.goLive)}" placeholder="MM/DD/YYYY" /></div>
+        <div class="field"><label>Open House #1</label><input id="f_openHouse1" value="${esc(listing.openHouse1)}" placeholder="MM/DD/YYYY" /></div>
+        <div class="field"><label>Open House #2</label><input id="f_openHouse2" value="${esc(listing.openHouse2)}" placeholder="MM/DD/YYYY" /></div>
+        <div class="field"><label>Mutual Acceptance</label><input id="f_mutualAcceptance" value="${esc(listing.mutualAcceptance)}" placeholder="MM/DD/YYYY" /></div>
+        <div class="field"><label>Appraisal Date</label><input id="f_appraisalDate" value="${esc(listing.appraisalDate)}" placeholder="MM/DD/YYYY" /></div>
         <div class="field"><label>Closing Date</label><input id="f_closingDate" value="${esc(listing.closingDate)}" placeholder="MM/DD/YYYY" /></div>
       </div>
 
@@ -472,13 +539,90 @@ function renderDetail(listing) {
       </div>
     </div>
 
-    ${sections}
+    <div class="desktop-only">${renderChecklistSections(listing)}</div>
 
     <div class="card notes-card">
       <div class="field"><label>Notes</label>
-        <textarea id="f_notes" placeholder="Vendor contacts, communication log, anything worth remembering...">${esc(listing.notes)}</textarea>
+        <textarea id="f_notes" placeholder="Communication log, anything worth remembering...">${esc(listing.notes)}</textarea>
       </div>
     </div>
+    ${renderBottomTabs()}
+  `;
+}
+
+function renderListingScopedEmpty(screenName) {
+  return `
+    ${renderTopbar()}
+    <div class="card empty-state"><div class="big">🏠</div>Select a listing first to view its ${screenName}.</div>
+    ${renderBottomTabs()}
+  `;
+}
+
+function renderChecklistScreen(listing) {
+  if (!listing) return renderListingScopedEmpty("checklist");
+  return `
+    ${renderTopbar()}
+    <button class="back-link" id="backBtn">← All listings</button>
+    <div class="toolbar"><h2>✅ Checklist</h2><span class="sub">${esc(listing.property) || "Untitled listing"}</span></div>
+    ${renderChecklistSections(listing)}
+    ${renderBottomTabs()}
+  `;
+}
+
+function renderTimeline(listing) {
+  if (!listing) return renderListingScopedEmpty("timeline");
+  const events = [
+    ["Go-Live", listing.goLive],
+    ["Open House #1", listing.openHouse1],
+    ["Open House #2", listing.openHouse2],
+    ["Mutual Acceptance", listing.mutualAcceptance],
+    ["Appraisal", listing.appraisalDate],
+    ["Closing", listing.closingDate],
+  ];
+  const rows = events.map(([name, date]) => `
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div><div class="timeline-title">${esc(name)}</div><div class="timeline-date">${esc(date) || "No date set"}</div></div>
+    </div>`).join("");
+  return `
+    ${renderTopbar()}
+    <button class="back-link" id="backBtn">← All listings</button>
+    <div class="toolbar"><h2>📅 Timeline</h2><span class="sub">${esc(listing.property) || "Untitled listing"}</span></div>
+    <div class="card timeline-list">${rows}</div>
+    ${renderBottomTabs()}
+  `;
+}
+
+function renderSettings() {
+  const listing = currentListing();
+  const vendorRows = listing && listing.vendors.length ? listing.vendors.map(v => `
+    <div class="task-row">
+      <div style="flex:1;">
+        <div class="task-name">${esc(v.name) || "Unnamed vendor"}</div>
+        <div class="task-tags"><span class="tag tag-owner">${esc(v.role) || "Role"}</span><span class="tag tag-owner">${esc(v.contact) || "No contact"}</span></div>
+      </div>
+      <button class="icon-btn btn-sm" data-vendor-delete="${esc(v.id)}">✕</button>
+    </div>`).join("") : `<div class="empty-state" style="padding:24px;">${listing ? "No vendors yet." : "Open a listing to add vendors and listing notes."}</div>`;
+  return `
+    ${renderTopbar()}
+    <div class="toolbar"><h2>⚙️ Settings</h2></div>
+    <div class="card notes-card">
+      <div class="field"><label>Team Name</label><input id="settingsTeamName" value="${esc(state.teamName)}" /></div>
+      <button class="btn-ghost" id="settingsThemeToggle">${state.theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}</button>
+    </div>
+    <div class="card notes-card">
+      <h3>Vendors & Notes</h3>
+      <div class="sub">${listing ? esc(listing.property) || "Untitled listing" : "Listing-scoped section"}</div>
+      <div class="field" style="margin-top:12px;"><label>Listing Notes</label><textarea id="settingsNotes" ${listing ? "" : "disabled"}>${listing ? esc(listing.notes) : ""}</textarea></div>
+      <div class="vendor-row">
+        <div class="field"><label>Name</label><input id="vendorName" ${listing ? "" : "disabled"} /></div>
+        <div class="field"><label>Role</label><input id="vendorRole" ${listing ? "" : "disabled"} /></div>
+        <div class="field"><label>Contact</label><input id="vendorContact" ${listing ? "" : "disabled"} /></div>
+        <button class="btn-primary" id="addVendorBtn" ${listing ? "" : "disabled"}>Add</button>
+      </div>
+      <div class="task-list" style="margin-top:14px;">${vendorRows}</div>
+    </div>
+    ${renderBottomTabs()}
   `;
 }
 
@@ -488,9 +632,30 @@ function bindEvents() {
   if (teamNameInput) teamNameInput.addEventListener("change", e => { state.teamName = e.target.value; saveState(); });
 
   const themeToggle = document.getElementById("themeToggle");
-  if (themeToggle) themeToggle.addEventListener("click", () => {
-    state.theme = state.theme === "dark" ? "light" : "dark";
-    saveState(); render();
+  if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+
+  const settingsThemeToggle = document.getElementById("settingsThemeToggle");
+  if (settingsThemeToggle) settingsThemeToggle.addEventListener("click", toggleTheme);
+
+  const settingsTeamName = document.getElementById("settingsTeamName");
+  if (settingsTeamName) settingsTeamName.addEventListener("change", e => { state.teamName = e.target.value; saveState(); render(); });
+
+  const settingsNotes = document.getElementById("settingsNotes");
+  if (settingsNotes) settingsNotes.addEventListener("change", e => { const listing = currentListing(); if (listing) { listing.notes = e.target.value; saveState(); } });
+
+  document.querySelectorAll("[data-tab]").forEach(el => {
+    el.addEventListener("click", () => {
+      const tab = el.getAttribute("data-tab");
+      if ((tab === "checklist" || tab === "timeline") && !currentListing()) {
+        alert("Select a listing first.");
+        state.view = { screen: "dashboard", listingId: null };
+      } else if (tab === "dashboard") {
+        state.view = { screen: "dashboard", listingId: null };
+      } else {
+        state.view = { screen: tab, listingId: state.view.listingId };
+      }
+      saveState(); render();
+    });
   });
 
   const addBtn = document.getElementById("addListingBtn");
@@ -543,8 +708,38 @@ function bindEvents() {
   bindFieldInput("f_mls", "mls");
   bindFieldInput("f_listPrice", "listPrice");
   bindFieldInput("f_goLive", "goLive");
+  bindFieldInput("f_openHouse1", "openHouse1");
+  bindFieldInput("f_openHouse2", "openHouse2");
+  bindFieldInput("f_mutualAcceptance", "mutualAcceptance");
+  bindFieldInput("f_appraisalDate", "appraisalDate");
   bindFieldInput("f_closingDate", "closingDate");
   bindFieldInput("f_notes", "notes");
+
+  const addVendorBtn = document.getElementById("addVendorBtn");
+  if (addVendorBtn) addVendorBtn.addEventListener("click", () => {
+    const listing = currentListing();
+    if (!listing) return;
+    const name = document.getElementById("vendorName").value.trim();
+    const role = document.getElementById("vendorRole").value.trim();
+    const contact = document.getElementById("vendorContact").value.trim();
+    if (!name && !role && !contact) return;
+    listing.vendors.push({ id: uid(), name, role, contact });
+    saveState(); render();
+  });
+
+  document.querySelectorAll("[data-vendor-delete]").forEach(el => {
+    el.addEventListener("click", () => {
+      const listing = currentListing();
+      if (!listing) return;
+      listing.vendors = listing.vendors.filter(v => v.id !== el.getAttribute("data-vendor-delete"));
+      saveState(); render();
+    });
+  });
+}
+
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  saveState(); render();
 }
 
 function bindFieldInput(elId, key) {
