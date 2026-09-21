@@ -501,6 +501,132 @@ function freshListing(overrides) {
   }, overrides || {});
 }
 
+
+function setDone(listing, taskNames) {
+  const doneNames = new Set(taskNames);
+  listing.checklist.forEach(t => { if (doneNames.has(t.name)) t.done = true; });
+  return listing;
+}
+
+function sampleListings() {
+  return [
+    setDone(freshListing({
+      property: "4821 Magnolia Ridge Dr, Bellevue",
+      seller: "Maya Thompson",
+      mls: "2291847",
+      listPrice: "$1,285,000",
+      goLive: "10/03/2026",
+      openHouse1: "10/05/2026",
+      openHouse2: "10/06/2026",
+      stage: "MLS Live",
+      notes: "Premium listing. Staging complete, photography delivered, seller wants daily traffic updates after launch.",
+      vendors: [
+        { id: uid(), name: "BrightFrame Photo", role: "Photography", contact: "photos@brightframe.example" },
+        { id: uid(), name: "Evergreen Staging", role: "Staging", contact: "206-555-0148" },
+        { id: uid(), name: "Pinnacle Title", role: "Title", contact: "orders@pinnacletitle.example" },
+      ],
+    }), [
+      "Listing Agreement (Form 1A)",
+      "WBC Disclosure Receipt",
+      "Listing Input Sheet (Form 1 or 10)",
+      "Seller Disclosure (Form 17)",
+      "FIRPTA Certification (Form 22E)",
+      "Order Title Package",
+      "Staging Scheduled",
+      "Photo Shoot Appointment Set",
+      "Photo shot list shared with photographer",
+      "Download MLS & Save in File",
+    ]),
+    setDone(freshListing({
+      property: "910 Harborview Ave, Edmonds",
+      seller: "The Carter Family Trust",
+      mls: "2287741",
+      listPrice: "$875,000",
+      goLive: "10/11/2026",
+      openHouse1: "10/12/2026",
+      stage: "Photos",
+      notes: "Waterfront-adjacent home. Waiting on final window cleaning and twilight photo shoot before MLS copy lock.",
+      vendors: [
+        { id: uid(), name: "Northwest Clean Co.", role: "Cleaning", contact: "425-555-0182" },
+        { id: uid(), name: "Skyline Media", role: "Twilight Photos", contact: "hello@skylinemedia.example" },
+      ],
+    }), [
+      "Listing Agreement (Form 1A)",
+      "Seller Disclosure (Form 17)",
+      "Pre-Inspection Scheduled",
+      "Sewer Scope Scheduled",
+      "Cleaner Scheduled",
+      "Window Cleaning Scheduled",
+      "Keys Made",
+      "Photo Shoot Appointment Set",
+    ]),
+    setDone(freshListing({
+      property: "2378 Cedar Hollow Ln, Kirkland",
+      seller: "Daniel & Priya Shah",
+      mls: "",
+      listPrice: "$1,045,000",
+      goLive: "10/18/2026",
+      stage: "Prep",
+      notes: "Seller is reviewing disclosures. Need utilities form and sign location confirmed before marketing packet goes out.",
+      vendors: [
+        { id: uid(), name: "Cascade Sewer Scope", role: "Sewer Scope", contact: "dispatch@cascade.example" },
+        { id: uid(), name: "Hearth & Home Staging", role: "Consult", contact: "253-555-0119" },
+      ],
+    }), [
+      "Realist PDF copy saved in file",
+      "Listing Agreement (Form 1A)",
+      "WBC Disclosure Receipt",
+      "Pre-Inspection Scheduled",
+      "Order Title Package",
+    ]),
+    setDone(freshListing({
+      property: "1540 Willow Park Ct, Redmond",
+      seller: "Olivia Martinez",
+      mls: "2279912",
+      listPrice: "$735,000",
+      goLive: "09/18/2026",
+      openHouse1: "09/20/2026",
+      openHouse2: "09/21/2026",
+      mutualAcceptance: "09/27/2026",
+      appraisalDate: "10/04/2026",
+      closingDate: "10/24/2026",
+      stage: "Pending",
+      notes: "Mutual acceptance reached. Appraisal scheduled; keep seller updated on contingency milestones and closing reminders.",
+      vendors: [
+        { id: uid(), name: "Summit Escrow", role: "Escrow", contact: "team@summitescrow.example" },
+        { id: uid(), name: "Redwood Sign Co.", role: "Sign Removal", contact: "206-555-0171" },
+      ],
+    }), [
+      "Listing Agreement (Form 1A)",
+      "WBC Disclosure Receipt",
+      "Listing Input Sheet (Form 1 or 10)",
+      "Seller Disclosure (Form 17)",
+      "FIRPTA Certification (Form 22E)",
+      "Identification of Utilities (Form 22K)",
+      "Pre-Inspection Scheduled",
+      "Sewer Scope Scheduled",
+      "Order Title Package",
+      "Sign Ordered",
+      "Cleaner Scheduled",
+      "Window Cleaning Scheduled",
+      "Staging Scheduled",
+      "Photo Shoot Appointment Set",
+      "Photo shot list shared with photographer",
+      "Send Listing Paperwork to Office",
+      "Download MLS & Save in File",
+      "Verify Listing Docs Uploaded to MLS",
+      "Broker Open",
+      "Open House #1",
+      "Open House #2",
+      "Offers Reviewed",
+      "Mutual Acceptance Date",
+      "Sales Price Confirmed",
+      "Purchase & Sale Closing Date Set",
+      "Mutual Acceptance Procedure Reviewed",
+    ]),
+  ];
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
@@ -510,14 +636,7 @@ function loadState() {
     teamName: "Casa",
     theme: "light",
     view: { screen: "dashboard", listingId: null },
-    listings: [
-      freshListing({
-        property: "123 Example St, Sample City",
-        seller: "Sample Seller (delete this listing to start fresh)",
-        mls: "",
-        listPrice: "",
-      })
-    ],
+    listings: sampleListings(),
   };
 }
 
@@ -527,6 +646,10 @@ function migrateState(rawState) {
   if (next.theme !== "light" && next.theme !== "dark") next.theme = "light";
   if (!next.view || !next.view.screen) next.view = { screen: "dashboard", listingId: null };
   if (!Array.isArray(next.listings)) next.listings = [];
+  const hasOnlyOldPlaceholder = next.listings.length === 1
+    && next.listings[0].property === "123 Example St, Sample City"
+    && String(next.listings[0].seller || "").startsWith("Sample Seller");
+  if (hasOnlyOldPlaceholder) next.listings = sampleListings();
   next.listings = next.listings.map(l => Object.assign({
     id: uid(), property: "", seller: "", mls: "", listPrice: "",
     goLive: "", openHouse1: "", openHouse2: "", mutualAcceptance: "", appraisalDate: "", closingDate: "",
