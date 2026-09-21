@@ -6,25 +6,28 @@
 <title>Casa</title>
 <style>
   :root {
-    --bg: #fbfaf6;
-    --surface: #fffdf8;
-    --surface-2: #f3efe5;
-    --text: #2d2a26;
-    --muted: #6f6a61;
-    --border: #ded5c4;
-    --accent: #1f6f8b;
-    --accent-soft: #e5f3f6;
-    --green: #3d8064;
-    --yellow: #d8932a;
-    --yellow-soft: #fff2d5;
-    --red: #c9573d;
-    --red-soft: #fde8df;
-    --blue: #1f6f8b;
-    --blue-soft: #e5f3f6;
-    --lavender: #eee1f2;
-    --cream: #fbfaf6;
-    --shadow: 0 18px 45px rgba(64,50,32,0.12), 0 2px 8px rgba(64,50,32,0.06);
-    --radius: 24px;
+    --bg: #f7f9fb;
+    --surface: #ffffff;
+    --surface-2: #f3f6f9;
+    --text: #242832;
+    --muted: #7a8290;
+    --border: #e8edf3;
+    --accent: #73d2bd;
+    --accent-soft: #d8f4eb;
+    --green: #bdf0a5;
+    --green-strong: #55a975;
+    --yellow: #f8dd88;
+    --yellow-strong: #d99c22;
+    --red: #ffb7bd;
+    --red-strong: #d55f6b;
+    --blue: #aee8f5;
+    --blue-strong: #3f9fb6;
+    --purple: #d9b7f2;
+    --purple-strong: #8b63b3;
+    --pink: #ffc4dd;
+    --cream: #fff7df;
+    --shadow: 0 18px 42px rgba(31,39,52,0.10), 0 2px 8px rgba(31,39,52,0.06);
+    --radius: 22px;
   }
   :root:not([data-theme="light"]) {
     @media (prefers-color-scheme: dark) {
@@ -73,33 +76,43 @@
   html, body { margin: 0; padding: 0; }
   body {
     background:
-      radial-gradient(circle at 8% 10%, rgba(236,225,242,0.9), transparent 30%),
-      linear-gradient(180deg, #fffdf9 0%, var(--bg) 28%);
+      radial-gradient(circle at 84% 18%, rgba(115,210,189,0.22), transparent 26%),
+      linear-gradient(180deg, #ffffff 0%, #f7f9fb 44%, #f3f6fb 100%);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
     line-height: 1.45;
     min-height: 100vh;
   }
-  #app { max-width: 1140px; margin: 0 auto; padding: 0 18px 88px; }
+  #app { max-width: 1220px; margin: 0 auto; padding: 0 18px 88px 82px; position: relative; }
+  .side-rail {
+    position: fixed; left: max(14px, calc((100vw - 1220px)/2 + 14px)); top: 76px; z-index: 30;
+    width: 54px; padding: 10px 7px; border: 1px solid var(--border); border-radius: 18px;
+    background: rgba(255,255,255,0.88); box-shadow: 0 12px 30px rgba(31,39,52,0.08); backdrop-filter: blur(16px);
+    display: grid; gap: 8px;
+  }
+  .rail-item { height: 39px; display: grid; place-items: center; border-radius: 13px; color: #667085; font-size: 19px; }
+  .rail-item.active { background: var(--accent-soft); color: #2c8b78; }
+  .rail-item:hover { background: var(--surface-2); }
+
 
   h1, h2, h3 { font-weight: 650; letter-spacing: -0.02em; margin: 0; }
   h1, .brand-name-input { font-family: Georgia, "Times New Roman", serif; }
   .promo-bar {
-    margin: 0 -18px 0; padding: 14px 18px; text-align: center;
-    background: var(--lavender); color: var(--text); font-size: 15px;
+    margin: 0 -18px 0; padding: 12px 18px; text-align: center;
+    background: linear-gradient(90deg, #f6d8ec, #d5f4ee, #fff0bf); color: var(--text); font-size: 14px;
   }
-  .promo-bar strong { color: #dd664f; text-decoration: underline; }
+  .promo-bar strong { color: #d55f6b; text-decoration: underline; }
   .topbar {
-    margin: 0 -18px 28px; padding: 20px 18px;
+    margin: 0 -18px 26px; padding: 18px 18px;
     display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
-    background: rgba(255,253,248,0.86); border-bottom: 1px solid rgba(222,213,196,0.7);
+    background: rgba(255,255,255,0.92); border-bottom: 1px solid var(--border);
     backdrop-filter: blur(14px);
   }
   .brand { display: flex; align-items: center; gap: 12px; }
   .brand-emoji { font-size: 32px; filter: drop-shadow(0 8px 18px rgba(31,111,139,0.2)); }
   .brand-name-input {
     font-size: 34px; font-weight: 500; letter-spacing: -0.04em;
-    background: transparent; border: none; color: var(--accent);
+    background: transparent; border: none; color: #2c8b78;
     border-bottom: 1px dashed transparent; padding: 0; min-width: 118px;
   }
   .brand-name-input:hover, .brand-name-input:focus { border-bottom-color: var(--border); outline: none; }
@@ -121,9 +134,23 @@
   .icon-btn:hover { background: var(--surface-2); color: var(--text); }
 
   .card {
-    background: rgba(255,253,248,0.92); border: 1px solid var(--border);
+    background: rgba(255,255,255,0.94); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow);
   }
+  .calendar-board { padding: 14px; border-radius: 28px; background: #fff; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .calendar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .calendar-col { min-height: 168px; border-right: 1px solid #edf1f5; padding: 8px; }
+  .calendar-col:last-child { border-right: none; }
+  .calendar-day { display:flex; justify-content:space-between; align-items:baseline; font-weight:800; margin-bottom:8px; }
+  .calendar-day small { color: var(--muted); font-weight:700; }
+  .event-chip { border-radius: 12px; padding: 9px 10px; margin-bottom: 8px; font-size: 12px; font-weight: 800; color: #3d4350; display:flex; justify-content:space-between; gap:8px; }
+  .event-chip .avatar-dot { width:20px; height:20px; border-radius:50%; display:grid; place-items:center; font-size:10px; color:#fff; background:rgba(0,0,0,.22); flex:0 0 auto; }
+  .pastel-pink { background: #ffc7d7; }
+  .pastel-purple { background: #d9b7f2; }
+  .pastel-green { background: #bdf0a5; }
+  .pastel-blue { background: #aee8f5; }
+  .pastel-yellow { background: #ffe39a; }
+
 
   /* Dashboard */
   .hero {
@@ -136,25 +163,27 @@
   .hero p { max-width: 520px; margin: 18px 0 24px; color: var(--muted); font-size: 18px; }
   .hero-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
   .device-card {
-    position: relative; min-height: 340px; padding: 26px;
-    background: linear-gradient(135deg, #f8f2e7, #ffffff 52%, #e7f3f5);
-    border-radius: 32px; overflow: hidden;
+    position: relative; min-height: 340px; padding: 18px;
+    background: linear-gradient(135deg, #f2f8fb, #ffffff 48%, #effbf5);
+    border-radius: 34px; overflow: hidden; border: 1px solid var(--border);
   }
   .device-screen {
-    background: #fff; border: 14px solid #f8f7f4; border-radius: 30px;
-    min-height: 260px; padding: 20px; box-shadow: 0 24px 45px rgba(55,46,31,0.22);
-    transform: rotate(-1.5deg);
+    background: #fff; border: 12px solid #f3f5f8; border-radius: 30px;
+    min-height: 286px; padding: 14px; box-shadow: 0 24px 45px rgba(31,39,52,0.16);
+    transform: rotate(-1.2deg);
   }
-  .screen-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .screen-title { font-family: Georgia, "Times New Roman", serif; font-size: 24px; color: var(--accent); }
-  .screen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .screen-tile { min-height: 64px; border-radius: 14px; padding: 10px; font-size: 12px; font-weight: 700; color: #554b3e; }
-  .screen-tile:nth-child(1) { background: #f6cfc4; }
-  .screen-tile:nth-child(2) { background: #cde7e8; }
-  .screen-tile:nth-child(3) { background: #f9e4a8; }
-  .screen-tile:nth-child(4) { background: #d6ead7; }
-  .screen-tile:nth-child(5) { background: #e5d7f0; }
-  .screen-tile:nth-child(6) { background: #f3d8c4; }
+  .screen-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .screen-title { font-size: 18px; font-weight: 850; color: #2b3340; }
+  .screen-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+  .screen-tile { min-height: 54px; border-radius: 12px; padding: 8px; font-size: 11px; font-weight: 800; color: #3d4350; }
+  .screen-tile:nth-child(1) { background: #bdf0a5; }
+  .screen-tile:nth-child(2) { background: #d9b7f2; }
+  .screen-tile:nth-child(3) { background: #aee8f5; }
+  .screen-tile:nth-child(4) { background: #ffc7d7; }
+  .screen-tile:nth-child(5) { background: #ffe39a; }
+  .screen-tile:nth-child(6) { background: #bdf0a5; }
+  .screen-tile:nth-child(7) { background: #aee8f5; }
+  .screen-tile:nth-child(8) { background: #ffc7d7; }
   .seal {
     position: absolute; left: 22px; top: 20px; width: 82px; height: 82px; border-radius: 50%;
     display: grid; place-items: center; text-align: center; padding: 10px;
@@ -166,20 +195,25 @@
   .dashboard-head .sub { color: var(--muted); }
   .listing-row {
     display: grid; grid-template-columns: 1.6fr 1fr 1fr 0.6fr auto;
-    gap: 14px; align-items: center; padding: 18px 20px;
-    border-bottom: 1px solid var(--border); cursor: pointer;
+    gap: 14px; align-items: center; padding: 16px 18px; margin: 10px;
+    border-radius: 18px; border: 0; cursor: pointer; color:#333a45;
   }
+  .listing-row:nth-child(5n+1) { background: #bdf0a5; }
+  .listing-row:nth-child(5n+2) { background: #d9b7f2; }
+  .listing-row:nth-child(5n+3) { background: #aee8f5; }
+  .listing-row:nth-child(5n+4) { background: #ffc7d7; }
+  .listing-row:nth-child(5n+5) { background: #ffe39a; }
   .listing-row:last-child { border-bottom: none; }
-  .listing-row:hover { background: rgba(31,111,139,0.06); }
-  .listing-prop { font-weight: 750; }
-  .listing-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .listing-row:hover { filter: saturate(1.08) brightness(0.99); transform: translateY(-1px); }
+  .listing-prop { font-weight: 850; }
+  .listing-sub { font-size: 12.5px; color: rgba(41,48,59,.72); margin-top: 3px; }
   .stage-badge {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700;
-    padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800;
+    padding: 6px 12px; border-radius: 999px; white-space: nowrap; background: rgba(255,255,255,.62) !important; color:#303846 !important;
   }
   .progress-wrap { display: flex; flex-direction: column; gap: 6px; min-width: 110px; }
-  .progress-bar-bg { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 999px; }
+  .progress-bar-bg { height: 8px; border-radius: 999px; background: rgba(255,255,255,.55); overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: rgba(45,56,70,.55); border-radius: 999px; }
   .progress-label { font-size: 12px; color: var(--muted); }
   .open-items { font-size: 14px; color: var(--text); text-align: center; font-weight: 750; }
   .open-items small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; }
@@ -280,11 +314,13 @@
     .progress-wrap { min-width: 0; }
     .desktop-only { display: none; }
     .vendor-row { grid-template-columns: 1fr; }
+    #app { padding-left: 14px; }
+    .side-rail { display: none; }
     .mobile-bottom-tabs {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
       padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-      background: var(--surface); border-top: 1px solid var(--border); box-shadow: var(--shadow);
+      background: rgba(255,255,255,.94); border-top: 1px solid var(--border); box-shadow: var(--shadow);
     }
     .tab-btn { background: transparent; color: var(--muted); border-radius: 14px; padding: 8px 4px; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .tab-btn strong { font-size: 18px; line-height: 1; }
@@ -486,7 +522,14 @@ function render() {
 }
 
 function renderTopbar() {
+  const active = state.view.screen || "dashboard";
   return `
+    <aside class="side-rail desktop-only" aria-label="Primary navigation">
+      <button class="rail-item ${active === "dashboard" ? "active" : ""}" data-tab="dashboard" title="Dashboard">▦</button>
+      <button class="rail-item ${active === "checklist" ? "active" : ""}" data-tab="checklist" title="Checklist">✓</button>
+      <button class="rail-item ${active === "timeline" ? "active" : ""}" data-tab="timeline" title="Timeline">◷</button>
+      <button class="rail-item ${active === "settings" ? "active" : ""}" data-tab="settings" title="Settings">⚙</button>
+    </aside>
     <div class="promo-bar desktop-only">Every listing, one calm dashboard — <strong>Casa keeps your team in sync</strong></div>
     <div class="topbar">
       <div class="brand">
@@ -497,10 +540,10 @@ function renderTopbar() {
         </div>
       </div>
       <nav class="nav-links desktop-only">
-        <span>Listings</span>
-        <span>Checklist</span>
-        <span>Timeline</span>
-        <span>Settings</span>
+        <span>▦ Listings</span>
+        <span>✓ Checklist</span>
+        <span>◷ Timeline</span>
+        <span>⚙ Settings</span>
       </nav>
       <div style="display:flex; gap:8px; align-items:center;">
         <button class="icon-btn theme-toggle" id="themeToggle" title="Toggle theme">${state.theme === "dark" ? "☀️" : "🌙"}</button>
@@ -520,19 +563,17 @@ function renderHero() {
         </div>
       </div>
       <div class="device-card">
-        <div class="seal">CASA<br/>VERIFIED</div>
-        <div class="device-screen">
+        <div class="seal">CASA<br/>BOARD</div>
+        <div class="device-screen calendar-board">
           <div class="screen-head">
-            <div class="screen-title">Today</div>
-            <span>🏡</span>
+            <div class="screen-title">Wed, Listing Week</div>
+            <span>Today ›</span>
           </div>
-          <div class="screen-grid">
-            <div class="screen-tile">Docs</div>
-            <div class="screen-tile">Prep</div>
-            <div class="screen-tile">Marketing</div>
-            <div class="screen-tile">Open House</div>
-            <div class="screen-tile">Pending</div>
-            <div class="screen-tile">Closed</div>
+          <div class="calendar-grid">
+            <div class="calendar-col"><div class="calendar-day">Prep <small>4 tasks</small></div><div class="event-chip pastel-green">Docs signed <span class="avatar-dot">A</span></div><div class="event-chip pastel-blue">Photos booked <span class="avatar-dot">P</span></div></div>
+            <div class="calendar-col"><div class="calendar-day">MLS <small>3 tasks</small></div><div class="event-chip pastel-purple">Copy review <span class="avatar-dot">M</span></div><div class="event-chip pastel-yellow">Go-live ready <span class="avatar-dot">G</span></div></div>
+            <div class="calendar-col"><div class="calendar-day">Show <small>5 tasks</small></div><div class="event-chip pastel-pink">Open house <span class="avatar-dot">O</span></div><div class="event-chip pastel-green">Feedback sent <span class="avatar-dot">F</span></div></div>
+            <div class="calendar-col"><div class="calendar-day">Close <small>2 tasks</small></div><div class="event-chip pastel-blue">Offer review <span class="avatar-dot">R</span></div><div class="event-chip pastel-yellow">Closing prep <span class="avatar-dot">C</span></div></div>
           </div>
         </div>
       </div>
@@ -546,8 +587,8 @@ function renderDashboard() {
     return `
       <div class="listing-row" data-open="${l.id}">
         <div>
-          <div class="listing-prop">${esc(l.property) || "Untitled listing"}</div>
-          <div class="listing-sub">${esc(l.seller) || "No seller yet"}${l.listPrice ? " · " + esc(l.listPrice) : ""}</div>
+          <div class="listing-prop">🏠 ${esc(l.property) || "Untitled listing"}</div>
+          <div class="listing-sub">👤 ${esc(l.seller) || "No seller yet"}${l.listPrice ? " · 💵 " + esc(l.listPrice) : ""}</div>
         </div>
         <div><span class="stage-badge" style="background:${sc.bg}; color:${sc.fg}">${esc(l.stage)}</span></div>
         <div class="progress-wrap">
@@ -605,10 +646,10 @@ function renderBottomTabs() {
   const active = state.view.screen;
   return `
     <nav class="mobile-bottom-tabs" aria-label="Mobile navigation">
-      <button class="tab-btn ${active === "dashboard" ? "active" : ""}" data-tab="dashboard"><strong>🏠</strong>Dashboard</button>
-      <button class="tab-btn ${active === "checklist" ? "active" : ""}" data-tab="checklist"><strong>✅</strong>Checklist</button>
-      <button class="tab-btn ${active === "timeline" ? "active" : ""}" data-tab="timeline"><strong>📅</strong>Timeline</button>
-      <button class="tab-btn ${active === "settings" ? "active" : ""}" data-tab="settings"><strong>⚙️</strong>Settings</button>
+      <button class="tab-btn ${active === "dashboard" ? "active" : ""}" data-tab="dashboard"><strong>▦</strong>Dashboard</button>
+      <button class="tab-btn ${active === "checklist" ? "active" : ""}" data-tab="checklist"><strong>✓</strong>Checklist</button>
+      <button class="tab-btn ${active === "timeline" ? "active" : ""}" data-tab="timeline"><strong>◷</strong>Timeline</button>
+      <button class="tab-btn ${active === "settings" ? "active" : ""}" data-tab="settings"><strong>⚙</strong>Settings</button>
     </nav>`;
 }
 
