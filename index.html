@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Listing Tracker</title>
+<title>Casa</title>
 <style>
   :root {
     --bg: #f6f5f2;
@@ -338,7 +338,7 @@ function loadState() {
     if (raw) return JSON.parse(raw);
   } catch (e) { /* corrupted or unavailable — fall through to defaults */ }
   return {
-    teamName: "Your Real Estate Business",
+    teamName: "Casa",
     theme: "light",
     view: { screen: "dashboard", listingId: null },
     listings: [
@@ -354,7 +354,7 @@ function loadState() {
 
 function migrateState(rawState) {
   const next = rawState || {};
-  if (!next.teamName) next.teamName = "Your Real Estate Business";
+  if (!next.teamName || next.teamName === "Your Real Estate Business") next.teamName = "Casa";
   if (next.theme !== "light" && next.theme !== "dark") next.theme = "light";
   if (!next.view || !next.view.screen) next.view = { screen: "dashboard", listingId: null };
   if (!Array.isArray(next.listings)) next.listings = [];
@@ -422,7 +422,7 @@ function renderTopbar() {
         <span class="brand-emoji">🏡</span>
         <div>
           <input class="brand-name-input" id="teamNameInput" value="${esc(state.teamName)}" />
-          <div class="brand-sub">Listing tracker</div>
+          <div class="brand-sub">Listing workflow dashboard</div>
         </div>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">

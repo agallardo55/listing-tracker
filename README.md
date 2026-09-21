@@ -1,4 +1,4 @@
-# Listing Tracker
+# Casa
 
 A lightweight single-page MVP for tracking listing progress, checklist items, owners, priorities, and notes.
 
