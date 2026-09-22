@@ -224,7 +224,7 @@
   .phase-tab .phase-tab-count { opacity: .75; font-weight: 700; margin-left: 4px; }
   .phase-tab.active { color: var(--heading); border-color: var(--accent); }
   .kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: start; }
-  .kanban-board.single-phase { grid-template-columns: 1fr; max-width: 480px; }
+  .kanban-board.single-phase { grid-template-columns: 1fr; }
   .kanban-col { padding: 12px; border-radius: 20px; }
   .kanban-col-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px 12px; }
   .kanban-col-title { font-size: 14px; font-weight: 800; color: var(--heading); }
@@ -743,32 +743,27 @@ function renderDashboard() {
   }).join("");
 
   const listings = state.listings.filter(l => listingPhase(l) === activePhase);
-  const cards = listings.map(l => {
+  const rows = listings.map(l => {
     const p = progress(l);
     const sc = stageColor(l.stage);
     return `
-      <div class="kanban-card ${PHASE_BG[activePhase]}" data-open="${l.id}">
-        <div style="display:flex; justify-content:space-between; gap:8px;">
+      <div class="listing-row" data-open="${l.id}">
+        <div>
           <div class="listing-prop">🏠 ${esc(l.property) || "Untitled listing"}</div>
-          <button class="icon-btn btn-sm" data-delete="${l.id}" title="Delete listing">✕</button>
+          <div class="listing-sub">👤 ${esc(l.seller) || "No seller yet"}${l.listPrice ? " · 💵 " + esc(l.listPrice) : ""}</div>
         </div>
-        <div class="listing-sub">👤 ${esc(l.seller) || "No seller yet"}${l.listPrice ? " · 💵 " + esc(l.listPrice) : ""}</div>
-        <div style="margin-top:8px;"><span class="stage-badge" style="background:${sc.bg}; color:${sc.fg}">${esc(l.stage)}</span></div>
+        <div><span class="stage-badge" style="background:${sc.bg}; color:${sc.fg}">${esc(l.stage)}</span></div>
         <div class="progress-wrap">
           <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${p.pct}%"></div></div>
-          <div class="progress-label">${p.open} open · ${p.pct}%</div>
+          <div class="progress-label">${p.pct}% complete</div>
         </div>
+        <div class="open-items">${p.open}<small>open items</small></div>
+        <button class="icon-btn btn-sm" data-delete="${l.id}" title="Delete listing">✕</button>
       </div>`;
   }).join("");
 
   const board = state.listings.length
-    ? `<div class="card kanban-col phase-board">
-        <div class="kanban-col-head">
-          <div class="kanban-col-title">${esc(activePhase)}</div>
-          <div class="kanban-col-count">${listings.length}</div>
-        </div>
-        <div class="kanban-cards">${cards || `<div class="kanban-empty">No listings in this phase</div>`}</div>
-      </div>`
+    ? (rows || `<div class="card empty-state"><div class="big">🏠</div>No listings in this phase.</div>`)
     : `<div class="card empty-state"><div class="big">🏠</div>No listings yet. Add your first one to start tracking.</div>`;
 
   return `
@@ -778,7 +773,7 @@ function renderDashboard() {
       <button class="btn-primary" id="addListingBtn">+ New Listing</button>
     </div>
     <div class="phase-tabs" aria-label="Listing phases">${phaseTabs}</div>
-    <div class="kanban-board single-phase">${board}</div>
+    <div class="listing-board">${board}</div>
     ${renderBottomTabs()}
   `;
 }
