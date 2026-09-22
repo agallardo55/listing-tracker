@@ -216,43 +216,28 @@
 
 
   /* Dashboard */
-  .hero {
-    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-    gap: 32px; align-items: center; margin: 8px 0 30px;
+  .phase-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+  .phase-tab {
+    padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 750;
+    background: var(--surface-2); color: var(--muted); border: 2px solid transparent;
   }
-  .hero-copy { padding: 10px 0 18px; }
-  .rating { color: var(--yellow); font-weight: 800; letter-spacing: 0.05em; margin-bottom: 10px; }
-  .hero h1 { font-size: clamp(42px, 6vw, 70px); line-height: 0.95; color: var(--heading); }
-  .hero p { max-width: 520px; margin: 18px 0 24px; color: var(--muted); font-size: 18px; }
-  .hero-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .device-card {
-    position: relative; min-height: 340px; padding: 18px;
-    background: linear-gradient(135deg, var(--surface-2), var(--surface) 48%, var(--accent-soft));
-    border-radius: 34px; overflow: hidden; border: 1px solid var(--border);
+  .phase-tab .phase-tab-count { opacity: .75; font-weight: 700; margin-left: 4px; }
+  .phase-tab.active { color: var(--heading); border-color: var(--accent); }
+  .kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: start; }
+  .kanban-board.single-phase { grid-template-columns: 1fr; max-width: 480px; }
+  .kanban-col { padding: 12px; border-radius: 20px; }
+  .kanban-col-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px 12px; }
+  .kanban-col-title { font-size: 14px; font-weight: 800; color: var(--heading); }
+  .kanban-col-count { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .kanban-cards { display: grid; gap: 10px; min-height: 40px; }
+  .kanban-card {
+    padding: 14px; border-radius: 16px; cursor: pointer; color: var(--row-text); border: 0;
   }
-  .device-screen {
-    background: var(--surface); border: 12px solid var(--surface-2); border-radius: 30px;
-    min-height: 286px; padding: 14px; box-shadow: 0 24px 45px rgba(31,39,52,0.16);
-    transform: rotate(-1.2deg);
-  }
-  .screen-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .screen-title { font-size: 18px; font-weight: 850; color: var(--text); }
-  .screen-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
-  .screen-tile { min-height: 54px; border-radius: 12px; padding: 8px; font-size: 11px; font-weight: 800; color: var(--tile-text); }
-  .screen-tile:nth-child(1) { background: #bdf0a5; }
-  .screen-tile:nth-child(2) { background: #d9b7f2; }
-  .screen-tile:nth-child(3) { background: #aee8f5; }
-  .screen-tile:nth-child(4) { background: #ffc7d7; }
-  .screen-tile:nth-child(5) { background: #ffe39a; }
-  .screen-tile:nth-child(6) { background: #bdf0a5; }
-  .screen-tile:nth-child(7) { background: #aee8f5; }
-  .screen-tile:nth-child(8) { background: #ffc7d7; }
-  .seal {
-    position: absolute; left: 22px; top: 20px; width: 82px; height: 82px; border-radius: 50%;
-    display: grid; place-items: center; text-align: center; padding: 10px;
-    background: #13465a; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
-    transform: rotate(-12deg);
-  }
+  .kanban-card:hover { filter: saturate(1.08) brightness(0.99); transform: translateY(-1px); }
+  .kanban-card .listing-prop { font-size: 13.5px; }
+  .kanban-card .listing-sub { margin-top: 4px; }
+  .kanban-card .progress-wrap { margin-top: 10px; }
+  .kanban-empty { padding: 16px 10px; text-align: center; color: var(--muted); font-size: 12.5px; }
   .dashboard-head { display: flex; justify-content: space-between; align-items: end; margin: 0 0 14px; gap: 14px; flex-wrap: wrap; }
   .dashboard-head h2 { font-family: Georgia, "Times New Roman", serif; color: var(--heading); font-size: 34px; font-weight: 500; }
   .dashboard-head .sub { color: var(--muted); }
@@ -361,17 +346,14 @@
 
   @media (max-width: 780px) {
     .nav-links span:not(:last-child) { display: none; }
-    .hero { grid-template-columns: 1fr; gap: 18px; }
-    .device-card { min-height: 280px; }
-    .device-screen { min-height: 220px; }
+    .kanban-board { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 640px) {
     #app { padding: 0 14px 96px; }
     .promo-bar, .topbar { margin-left: -14px; margin-right: -14px; }
     .brand-name-input { font-size: 30px; }
-    .hero h1 { font-size: 44px; }
-    .hero p { font-size: 16px; }
+    .kanban-board { grid-template-columns: 1fr; }
     .listing-row { grid-template-columns: 1fr; gap: 8px; }
     .open-items { text-align: left; }
     .progress-wrap { min-width: 0; }
@@ -627,6 +609,9 @@ function sampleListings() {
   ];
 }
 
+const PHASES = ["Prep", "MLS Live", "Showings/Offers", "Pending/Close"];
+const PHASE_BG = { "Prep": "pastel-blue", "MLS Live": "pastel-yellow", "Showings/Offers": "pastel-pink", "Pending/Close": "pastel-green" };
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
@@ -645,6 +630,10 @@ function migrateState(rawState) {
   if (!next.teamName || next.teamName === "Your Real Estate Business") next.teamName = "Casa";
   if (next.theme !== "light" && next.theme !== "dark") next.theme = "light";
   if (!next.view || !next.view.screen) next.view = { screen: "dashboard", listingId: null };
+  if (!PHASES.includes(next.view.dashboardPhase)) {
+    next.view.dashboardPhase = PHASES.includes(next.view.phase) ? next.view.phase : "Prep";
+  }
+  delete next.view.phase;
   if (!Array.isArray(next.listings)) next.listings = [];
   const hasOnlyOldPlaceholder = next.listings.length === 1
     && next.listings[0].property === "123 Example St, Sample City"
@@ -737,67 +726,59 @@ function renderTopbar() {
     </div>`;
 }
 
-function renderHero() {
-  return `
-    <div class="hero desktop-only">
-      <div class="hero-copy">
-        <div class="rating">★★★★★ Loved by listing teams</div>
-        <h1>Every listing,<br/>on track.</h1>
-        <p>Casa keeps pre-listing docs, staging, marketing, open houses, and closing tasks moving — so nothing falls through the cracks.</p>
-        <div class="hero-actions">
-          <button class="btn-primary" id="heroAddListingBtn">+ New Listing</button>
-        </div>
-      </div>
-      <div class="device-card">
-        <div class="seal">CASA<br/>BOARD</div>
-        <div class="device-screen calendar-board">
-          <div class="screen-head">
-            <div class="screen-title">Wed, Listing Week</div>
-            <span>Today ›</span>
-          </div>
-          <div class="calendar-grid">
-            <div class="calendar-col"><div class="calendar-day">Prep <small>4 tasks</small></div><div class="event-chip pastel-green">Docs signed <span class="avatar-dot">A</span></div><div class="event-chip pastel-blue">Photos booked <span class="avatar-dot">P</span></div></div>
-            <div class="calendar-col"><div class="calendar-day">MLS <small>3 tasks</small></div><div class="event-chip pastel-purple">Copy review <span class="avatar-dot">M</span></div><div class="event-chip pastel-yellow">Go-live ready <span class="avatar-dot">G</span></div></div>
-            <div class="calendar-col"><div class="calendar-day">Show <small>5 tasks</small></div><div class="event-chip pastel-pink">Open house <span class="avatar-dot">O</span></div><div class="event-chip pastel-green">Feedback sent <span class="avatar-dot">F</span></div></div>
-            <div class="calendar-col"><div class="calendar-day">Close <small>2 tasks</small></div><div class="event-chip pastel-blue">Offer review <span class="avatar-dot">R</span></div><div class="event-chip pastel-yellow">Closing prep <span class="avatar-dot">C</span></div></div>
-          </div>
-        </div>
-      </div>
-    </div>`;
+function listingPhase(listing) {
+  if (listing.stage === "Pending" || listing.stage === "Closed") return "Pending/Close";
+  if (listing.stage === "MLS Live") {
+    const offersReviewed = listing.checklist.some(t => t.name === "Offers Reviewed" && t.done);
+    return offersReviewed ? "Showings/Offers" : "MLS Live";
+  }
+  return "Prep";
 }
 
 function renderDashboard() {
-  const rows = state.listings.map(l => {
+  const activePhase = PHASES.includes(state.view.dashboardPhase) ? state.view.dashboardPhase : "Prep";
+  const phaseTabs = PHASES.map(phase => {
+    const count = state.listings.filter(l => listingPhase(l) === phase).length;
+    return `<button class="phase-tab ${phase === activePhase ? "active" : ""}" data-phase-tab="${esc(phase)}">${esc(phase)} <span class="phase-tab-count">${count}</span></button>`;
+  }).join("");
+
+  const listings = state.listings.filter(l => listingPhase(l) === activePhase);
+  const cards = listings.map(l => {
     const p = progress(l);
     const sc = stageColor(l.stage);
     return `
-      <div class="listing-row" data-open="${l.id}">
-        <div>
+      <div class="kanban-card ${PHASE_BG[activePhase]}" data-open="${l.id}">
+        <div style="display:flex; justify-content:space-between; gap:8px;">
           <div class="listing-prop">🏠 ${esc(l.property) || "Untitled listing"}</div>
-          <div class="listing-sub">👤 ${esc(l.seller) || "No seller yet"}${l.listPrice ? " · 💵 " + esc(l.listPrice) : ""}</div>
+          <button class="icon-btn btn-sm" data-delete="${l.id}" title="Delete listing">✕</button>
         </div>
-        <div><span class="stage-badge" style="background:${sc.bg}; color:${sc.fg}">${esc(l.stage)}</span></div>
+        <div class="listing-sub">👤 ${esc(l.seller) || "No seller yet"}${l.listPrice ? " · 💵 " + esc(l.listPrice) : ""}</div>
+        <div style="margin-top:8px;"><span class="stage-badge" style="background:${sc.bg}; color:${sc.fg}">${esc(l.stage)}</span></div>
         <div class="progress-wrap">
           <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${p.pct}%"></div></div>
-          <div class="progress-label">${p.pct}% complete</div>
+          <div class="progress-label">${p.open} open · ${p.pct}%</div>
         </div>
-        <div class="open-items">${p.open}<small>open items</small></div>
-        <div><button class="icon-btn btn-sm" data-delete="${l.id}" title="Delete listing">✕</button></div>
       </div>`;
   }).join("");
 
-  const body = state.listings.length
-    ? `<div class="card">${rows}</div>`
+  const board = state.listings.length
+    ? `<div class="card kanban-col phase-board">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title">${esc(activePhase)}</div>
+          <div class="kanban-col-count">${listings.length}</div>
+        </div>
+        <div class="kanban-cards">${cards || `<div class="kanban-empty">No listings in this phase</div>`}</div>
+      </div>`
     : `<div class="card empty-state"><div class="big">🏠</div>No listings yet. Add your first one to start tracking.</div>`;
 
   return `
     ${renderTopbar()}
-    ${renderHero()}
     <div class="dashboard-head">
       <h2>Listings</h2>
       <button class="btn-primary" id="addListingBtn">+ New Listing</button>
     </div>
-    ${body}
+    <div class="phase-tabs" aria-label="Listing phases">${phaseTabs}</div>
+    <div class="kanban-board single-phase">${board}</div>
     ${renderBottomTabs()}
   `;
 }
@@ -984,21 +965,27 @@ function bindEvents() {
       const tab = el.getAttribute("data-tab");
       if ((tab === "checklist" || tab === "timeline") && !currentListing()) {
         alert("Select a listing first.");
-        state.view = { screen: "dashboard", listingId: null };
+        state.view = { screen: "dashboard", listingId: null, dashboardPhase: state.view.dashboardPhase || "Prep" };
       } else if (tab === "dashboard") {
-        state.view = { screen: "dashboard", listingId: null };
+        state.view = { screen: "dashboard", listingId: null, dashboardPhase: state.view.dashboardPhase || "Prep" };
       } else {
-        state.view = { screen: tab, listingId: state.view.listingId };
+        state.view = { screen: tab, listingId: state.view.listingId, dashboardPhase: state.view.dashboardPhase || "Prep" };
       }
+      saveState(); render();
+    });
+  });
+
+  document.querySelectorAll("[data-phase-tab]").forEach(el => {
+    el.addEventListener("click", () => {
+      const phase = el.getAttribute("data-phase-tab");
+      if (!PHASES.includes(phase)) return;
+      state.view = { screen: "dashboard", listingId: null, dashboardPhase: phase };
       saveState(); render();
     });
   });
 
   const addBtn = document.getElementById("addListingBtn");
   if (addBtn) addBtn.addEventListener("click", openAddModal);
-
-  const heroAddBtn = document.getElementById("heroAddListingBtn");
-  if (heroAddBtn) heroAddBtn.addEventListener("click", openAddModal);
 
   document.querySelectorAll("[data-open]").forEach(el => {
     el.addEventListener("click", (e) => {
