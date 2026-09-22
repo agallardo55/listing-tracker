@@ -125,7 +125,6 @@
     background: linear-gradient(90deg, rgba(216,131,157,.28), rgba(115,210,189,.20), rgba(215,180,94,.24));
   }
   :root[data-theme="dark"] .topbar,
-  :root[data-theme="dark"] .side-rail,
   :root[data-theme="dark"] .mobile-bottom-tabs {
     background: rgba(var(--surface-rgb), .92);
   }
@@ -146,16 +145,7 @@
     line-height: 1.45;
     min-height: 100vh;
   }
-  #app { max-width: 1220px; margin: 0 auto; padding: 0 18px 88px 82px; position: relative; }
-  .side-rail {
-    position: fixed; left: max(14px, calc((100vw - 1220px)/2 + 14px)); top: 76px; z-index: 30;
-    width: 54px; padding: 10px 7px; border: 1px solid var(--border); border-radius: 18px;
-    background: rgba(var(--surface-rgb),0.88); box-shadow: 0 12px 30px rgba(31,39,52,0.08); backdrop-filter: blur(16px);
-    display: grid; gap: 8px;
-  }
-  .rail-item { height: 39px; display: grid; place-items: center; border-radius: 13px; color: #667085; font-size: 19px; }
-  .rail-item.active { background: var(--accent-soft); color: var(--brand); }
-  .rail-item:hover { background: var(--surface-2); }
+  #app { max-width: 1220px; margin: 0 auto; padding: 0 18px 88px; position: relative; }
 
 
   h1, h2, h3 { font-weight: 650; letter-spacing: -0.02em; margin: 0; }
@@ -359,8 +349,6 @@
     .progress-wrap { min-width: 0; }
     .desktop-only { display: none; }
     .vendor-row { grid-template-columns: 1fr; }
-    #app { padding-left: 14px; }
-    .side-rail { display: none; }
     .mobile-bottom-tabs {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
@@ -710,12 +698,6 @@ function render() {
 function renderTopbar() {
   const active = state.view.screen || "dashboard";
   return `
-    <aside class="side-rail desktop-only" aria-label="Primary navigation">
-      <button class="rail-item ${active === "dashboard" ? "active" : ""}" data-tab="dashboard" title="Dashboard">▦</button>
-      <button class="rail-item ${active === "checklist" ? "active" : ""}" data-tab="checklist" title="Checklist">✓</button>
-      <button class="rail-item ${active === "timeline" ? "active" : ""}" data-tab="timeline" title="Timeline">◷</button>
-      <button class="rail-item ${active === "settings" ? "active" : ""}" data-tab="settings" title="Settings">⚙</button>
-    </aside>
     <div class="promo-bar desktop-only">Every listing, one calm dashboard — <strong>Casa keeps your team in sync</strong></div>
     <div class="topbar">
       <div class="brand">
