@@ -611,6 +611,12 @@ function sampleListings() {
 
 const PHASES = ["Prep", "MLS Live", "Showings/Offers", "Pending/Close"];
 const PHASE_BG = { "Prep": "pastel-blue", "MLS Live": "pastel-yellow", "Showings/Offers": "pastel-pink", "Pending/Close": "pastel-green" };
+const PHASE_SECTIONS = {
+  "Prep": ["Pre-Listing Documents", "Scheduling + Property Prep"],
+  "MLS Live": ["Marketing + MLS Launch"],
+  "Showings/Offers": ["Open Houses + Offer Review"],
+  "Pending/Close": ["Pending to Closing", "Notes & Communication"],
+};
 
 function loadState() {
   try {
@@ -632,6 +638,9 @@ function migrateState(rawState) {
   if (!next.view || !next.view.screen) next.view = { screen: "dashboard", listingId: null };
   if (!PHASES.includes(next.view.dashboardPhase)) {
     next.view.dashboardPhase = PHASES.includes(next.view.phase) ? next.view.phase : "Prep";
+  }
+  if (!PHASES.includes(next.view.detailPhase)) {
+    next.view.detailPhase = "Prep";
   }
   delete next.view.phase;
   if (!Array.isArray(next.listings)) next.listings = [];
@@ -778,8 +787,9 @@ function renderDashboard() {
   `;
 }
 
-function renderChecklistSections(listing) {
-  return CHECKLIST_TEMPLATE.map(sec => {
+function renderChecklistSections(listing, phase) {
+  const sections = phase ? CHECKLIST_TEMPLATE.filter(sec => (PHASE_SECTIONS[phase] || []).includes(sec.section)) : CHECKLIST_TEMPLATE;
+  return sections.map(sec => {
     const tasks = listing.checklist.filter(t => t.section === sec.section);
     const done = tasks.filter(t => t.done).length;
     const rows = tasks.map(t => `
@@ -851,7 +861,11 @@ function renderDetail(listing) {
       </div>
     </div>
 
-    <div class="desktop-only">${renderChecklistSections(listing)}</div>
+    <div class="phase-tabs" aria-label="Listing detail phases">${PHASES.map(phase => {
+      const activeDetailPhase = PHASES.includes(state.view.detailPhase) ? state.view.detailPhase : "Prep";
+      return `<button class="phase-tab ${phase === activeDetailPhase ? "active" : ""}" data-detail-phase-tab="${esc(phase)}">${esc(phase)}</button>`;
+    }).join("")}</div>
+    <div class="detail-phase-cards">${renderChecklistSections(listing, PHASES.includes(state.view.detailPhase) ? state.view.detailPhase : "Prep")}</div>
 
     <div class="card notes-card">
       <div class="field"><label>Notes</label>
@@ -979,13 +993,22 @@ function bindEvents() {
     });
   });
 
+  document.querySelectorAll("[data-detail-phase-tab]").forEach(el => {
+    el.addEventListener("click", () => {
+      const phase = el.getAttribute("data-detail-phase-tab");
+      if (!PHASES.includes(phase)) return;
+      state.view.detailPhase = phase;
+      saveState(); render();
+    });
+  });
+
   const addBtn = document.getElementById("addListingBtn");
   if (addBtn) addBtn.addEventListener("click", openAddModal);
 
   document.querySelectorAll("[data-open]").forEach(el => {
     el.addEventListener("click", (e) => {
       if (e.target.closest("[data-delete]")) return;
-      state.view = { screen: "detail", listingId: el.getAttribute("data-open") };
+      state.view = { screen: "detail", listingId: el.getAttribute("data-open"), dashboardPhase: state.view.dashboardPhase || "Prep", detailPhase: state.view.detailPhase || "Prep" };
       saveState(); render();
     });
   });
