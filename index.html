@@ -610,6 +610,7 @@ function sampleListings() {
 }
 
 const PHASES = ["Prep", "MLS Live", "Showings/Offers", "Pending/Close"];
+const DETAIL_TABS = [...PHASES, "Notes"];
 const PHASE_BG = { "Prep": "pastel-blue", "MLS Live": "pastel-yellow", "Showings/Offers": "pastel-pink", "Pending/Close": "pastel-green" };
 const PHASE_SECTIONS = {
   "Prep": ["Pre-Listing Documents", "Scheduling + Property Prep"],
@@ -639,7 +640,7 @@ function migrateState(rawState) {
   if (!PHASES.includes(next.view.dashboardPhase)) {
     next.view.dashboardPhase = PHASES.includes(next.view.phase) ? next.view.phase : "Prep";
   }
-  if (!PHASES.includes(next.view.detailPhase)) {
+  if (!DETAIL_TABS.includes(next.view.detailPhase)) {
     next.view.detailPhase = "Prep";
   }
   delete next.view.phase;
@@ -861,17 +862,20 @@ function renderDetail(listing) {
       </div>
     </div>
 
-    <div class="phase-tabs" aria-label="Listing detail phases">${PHASES.map(phase => {
-      const activeDetailPhase = PHASES.includes(state.view.detailPhase) ? state.view.detailPhase : "Prep";
-      return `<button class="phase-tab ${phase === activeDetailPhase ? "active" : ""}" data-detail-phase-tab="${esc(phase)}">${esc(phase)}</button>`;
-    }).join("")}</div>
-    <div class="detail-phase-cards">${renderChecklistSections(listing, PHASES.includes(state.view.detailPhase) ? state.view.detailPhase : "Prep")}</div>
-
-    <div class="card notes-card">
-      <div class="field"><label>Notes</label>
-        <textarea id="f_notes" placeholder="Communication log, anything worth remembering...">${esc(listing.notes)}</textarea>
-      </div>
-    </div>
+    ${(() => {
+      const activeDetailTab = DETAIL_TABS.includes(state.view.detailPhase) ? state.view.detailPhase : "Prep";
+      const tabs = `<div class="phase-tabs" aria-label="Listing detail phases">${DETAIL_TABS.map(tab =>
+        `<button class="phase-tab ${tab === activeDetailTab ? "active" : ""}" data-detail-phase-tab="${esc(tab)}">${esc(tab)}</button>`
+      ).join("")}</div>`;
+      const body = activeDetailTab === "Notes"
+        ? `<div class="card notes-card">
+            <div class="field"><label>Notes</label>
+              <textarea id="f_notes" placeholder="Communication log, anything worth remembering...">${esc(listing.notes)}</textarea>
+            </div>
+          </div>`
+        : `<div class="detail-phase-cards">${renderChecklistSections(listing, activeDetailTab)}</div>`;
+      return tabs + body;
+    })()}
     ${renderBottomTabs()}
   `;
 }
@@ -937,9 +941,8 @@ function renderSettings() {
       <button class="btn-ghost" id="settingsThemeToggle">${state.theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}</button>
     </div>
     <div class="card notes-card">
-      <h3>Vendors & Notes</h3>
+      <h3>Vendors</h3>
       <div class="sub">${listing ? esc(listing.property) || "Untitled listing" : "Listing-scoped section"}</div>
-      <div class="field" style="margin-top:12px;"><label>Listing Notes</label><textarea id="settingsNotes" ${listing ? "" : "disabled"}>${listing ? esc(listing.notes) : ""}</textarea></div>
       <div class="vendor-row">
         <div class="field"><label>Name</label><input id="vendorName" ${listing ? "" : "disabled"} /></div>
         <div class="field"><label>Role</label><input id="vendorRole" ${listing ? "" : "disabled"} /></div>
@@ -996,7 +999,7 @@ function bindEvents() {
   document.querySelectorAll("[data-detail-phase-tab]").forEach(el => {
     el.addEventListener("click", () => {
       const phase = el.getAttribute("data-detail-phase-tab");
-      if (!PHASES.includes(phase)) return;
+      if (!DETAIL_TABS.includes(phase)) return;
       state.view.detailPhase = phase;
       saveState(); render();
     });
