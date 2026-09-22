@@ -610,10 +610,11 @@ function sampleListings() {
 }
 
 const PHASES = ["Prep", "MLS Live", "Showings/Offers", "Pending/Close"];
-const DETAIL_TABS = [...PHASES, "Notes"];
+const DETAIL_TABS = ["Prep", "Scheduling", "MLS Live", "Showings/Offers", "Pending/Close", "Notes"];
 const PHASE_BG = { "Prep": "pastel-blue", "MLS Live": "pastel-yellow", "Showings/Offers": "pastel-pink", "Pending/Close": "pastel-green" };
 const PHASE_SECTIONS = {
-  "Prep": ["Pre-Listing Documents", "Scheduling + Property Prep"],
+  "Prep": ["Pre-Listing Documents"],
+  "Scheduling": ["Scheduling + Property Prep"],
   "MLS Live": ["Marketing + MLS Launch"],
   "Showings/Offers": ["Open Houses + Offer Review"],
   "Pending/Close": ["Pending to Closing", "Notes & Communication"],
