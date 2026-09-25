@@ -575,6 +575,50 @@ function setDone(listing, taskNames) {
 
 function sampleListings() {
   return [
+    /* ── Prep phase ── */
+    setDone(freshListing({
+      property: "2378 Cedar Hollow Ln, Kirkland",
+      seller: "Daniel & Priya Shah",
+      mls: "",
+      listPrice: "$1,045,000",
+      goLive: "10/18/2026",
+      stage: "Prep",
+      notes: "Seller reviewing disclosures. Sign location confirmed. Staging consult booked for Oct 10 — Hearth & Home recommends full living room and master.",
+      vendors: [
+        { id: uid(), name: "Cascade Sewer Scope", role: "Sewer Scope", contact: "dispatch@cascade.example" },
+        { id: uid(), name: "Hearth & Home Staging", role: "Staging Consult", contact: "253-555-0119" },
+        { id: uid(), name: "Pinnacle Title", role: "Title", contact: "orders@pinnacletitle.example" },
+      ],
+    }), [
+      "Realist PDF copy saved in file",
+      "Listing Agreement (Form 1A)",
+      "WBC Disclosure Receipt",
+      "Seller Disclosure (Form 17)",
+      "FIRPTA Certification (Form 22E)",
+      "Pre-Inspection Scheduled",
+      "Order Title Package",
+      "Stake Sign Location",
+      "Sign Ordered",
+    ]),
+    setDone(freshListing({
+      property: "817 Ridgeline Ct, Sammamish",
+      seller: "Robert & Linda Park",
+      mls: "",
+      listPrice: "$1,180,000",
+      goLive: "10/25/2026",
+      stage: "Listing Signed",
+      notes: "New construction — builder selling direct. Need pre-inspection waiver reviewed. Sellers traveling until Oct 8; all comms via email.",
+      vendors: [
+        { id: uid(), name: "Meridian Inspections", role: "Pre-Inspection", contact: "425-555-0234" },
+        { id: uid(), name: "Gold Key Title", role: "Title", contact: "goldkey@title.example" },
+      ],
+    }), [
+      "Realist PDF copy saved in file",
+      "Listing Agreement (Form 1A)",
+      "WBC Disclosure Receipt",
+    ]),
+
+    /* ── MLS Live phase ── */
     setDone(freshListing({
       property: "4821 Magnolia Ridge Dr, Bellevue",
       seller: "Maya Thompson",
@@ -584,23 +628,23 @@ function sampleListings() {
       openHouse1: "10/05/2026",
       openHouse2: "10/06/2026",
       stage: "MLS Live",
-      notes: "Premium listing. Staging complete, photography delivered, seller wants daily traffic updates after launch.",
+      notes: "Premium listing. Staging complete, photography delivered. Seller wants daily traffic reports. 14 showings in first 3 days — strong interest from 2 buyers.",
       vendors: [
         { id: uid(), name: "BrightFrame Photo", role: "Photography", contact: "photos@brightframe.example" },
         { id: uid(), name: "Evergreen Staging", role: "Staging", contact: "206-555-0148" },
         { id: uid(), name: "Pinnacle Title", role: "Title", contact: "orders@pinnacletitle.example" },
       ],
     }), [
-      "Listing Agreement (Form 1A)",
-      "WBC Disclosure Receipt",
-      "Listing Input Sheet (Form 1 or 10)",
-      "Seller Disclosure (Form 17)",
-      "FIRPTA Certification (Form 22E)",
-      "Order Title Package",
-      "Staging Scheduled",
-      "Photo Shoot Appointment Set",
-      "Photo shot list shared with photographer",
-      "Download MLS & Save in File",
+      "Listing Agreement (Form 1A)", "WBC Disclosure Receipt",
+      "Listing Input Sheet (Form 1 or 10)", "Seller Disclosure (Form 17)",
+      "FIRPTA Certification (Form 22E)", "Lead Disclosure (Form 22J)",
+      "Order Title Package", "Stake Sign Location", "Sign Ordered",
+      "Cleaner Scheduled", "Keys Made", "Staging Scheduled",
+      "Photo Shoot Appointment Set", "Add Listing to Supra & Lockbox Synced",
+      "Photo shot list shared with photographer", "Send Title & Title Review to Client",
+      "Send Listing Paperwork to Client", "Send Listing Paperwork to Office",
+      "Download MLS & Save in File", "Verify Listing Docs Uploaded to MLS",
+      "Update Client Status Sheet",
     ]),
     setDone(freshListing({
       property: "910 Harborview Ave, Edmonds",
@@ -610,40 +654,53 @@ function sampleListings() {
       goLive: "10/11/2026",
       openHouse1: "10/12/2026",
       stage: "Photos",
-      notes: "Waterfront-adjacent home. Waiting on final window cleaning and twilight photo shoot before MLS copy lock.",
+      notes: "Waterfront-adjacent. Photos delivered Oct 9. Open house drew 22 groups. Offer review set for Oct 14 at 5pm. Expect 4–6 offers.",
       vendors: [
         { id: uid(), name: "Northwest Clean Co.", role: "Cleaning", contact: "425-555-0182" },
-        { id: uid(), name: "Skyline Media", role: "Twilight Photos", contact: "hello@skylinemedia.example" },
+        { id: uid(), name: "Skyline Media", role: "Photography", contact: "hello@skylinemedia.example" },
       ],
     }), [
-      "Listing Agreement (Form 1A)",
-      "Seller Disclosure (Form 17)",
-      "Pre-Inspection Scheduled",
-      "Sewer Scope Scheduled",
-      "Cleaner Scheduled",
-      "Window Cleaning Scheduled",
-      "Keys Made",
-      "Photo Shoot Appointment Set",
+      "Listing Agreement (Form 1A)", "Seller Disclosure (Form 17)",
+      "Pre-Inspection Scheduled", "Sewer Scope Scheduled", "Order Title Package",
+      "Cleaner Scheduled", "Window Cleaning Scheduled", "Keys Made",
+      "Photo Shoot Appointment Set", "Add Listing to Supra & Lockbox Synced",
+      "Photo shot list shared with photographer",
+      "Send Listing Paperwork to Client", "Download MLS & Save in File",
+      "Verify Listing Docs Uploaded to MLS",
     ]),
+
+    /* ── Showings/Offers phase ── */
     setDone(freshListing({
-      property: "2378 Cedar Hollow Ln, Kirkland",
-      seller: "Daniel & Priya Shah",
-      mls: "",
-      listPrice: "$1,045,000",
-      goLive: "10/18/2026",
-      stage: "Prep",
-      notes: "Seller is reviewing disclosures. Need utilities form and sign location confirmed before marketing packet goes out.",
+      property: "3340 Copperleaf Blvd, Renton",
+      seller: "James & Sofia Reyes",
+      mls: "2283190",
+      listPrice: "$799,000",
+      goLive: "09/28/2026",
+      openHouse1: "09/29/2026",
+      openHouse2: "09/30/2026",
+      mutualAcceptance: "10/07/2026",
+      stage: "Pending",
+      notes: "Received 5 offers. Accepted $835,000 — $36k over ask, no inspection contingency. Mutual acceptance signed Oct 7. Appraisal ordered.",
       vendors: [
-        { id: uid(), name: "Cascade Sewer Scope", role: "Sewer Scope", contact: "dispatch@cascade.example" },
-        { id: uid(), name: "Hearth & Home Staging", role: "Consult", contact: "253-555-0119" },
+        { id: uid(), name: "Sound Title Group", role: "Title", contact: "425-555-0301" },
+        { id: uid(), name: "Pacific Escrow", role: "Escrow", contact: "pe@pacific.example" },
       ],
     }), [
-      "Realist PDF copy saved in file",
-      "Listing Agreement (Form 1A)",
-      "WBC Disclosure Receipt",
-      "Pre-Inspection Scheduled",
-      "Order Title Package",
+      "Listing Agreement (Form 1A)", "WBC Disclosure Receipt",
+      "Listing Input Sheet (Form 1 or 10)", "Seller Disclosure (Form 17)",
+      "FIRPTA Certification (Form 22E)", "Identification of Utilities (Form 22K)",
+      "Order Title Package", "Sign Ordered", "Cleaner Scheduled",
+      "Staging Scheduled", "Photo Shoot Appointment Set",
+      "Add Listing to Supra & Lockbox Synced",
+      "Photo shot list shared with photographer",
+      "Send Listing Paperwork to Client", "Download MLS & Save in File",
+      "Verify Listing Docs Uploaded to MLS", "Broker Open",
+      "Open House #1", "Open House #2",
+      "Offers Reviewed", "Mutual Acceptance Date", "Sales Price Confirmed",
+      "Purchase & Sale Closing Date Set", "Mutual Acceptance Procedure Reviewed",
     ]),
+
+    /* ── Pending/Close phase ── */
     setDone(freshListing({
       property: "1540 Willow Park Ct, Redmond",
       seller: "Olivia Martinez",
@@ -656,38 +713,70 @@ function sampleListings() {
       appraisalDate: "10/04/2026",
       closingDate: "10/24/2026",
       stage: "Pending",
-      notes: "Mutual acceptance reached. Appraisal scheduled; keep seller updated on contingency milestones and closing reminders.",
+      notes: "Appraisal came in at value ($735k). Financing contingency cleared Oct 12. Final walkthrough Oct 23. Closing Oct 24 at Summit Escrow — seller confirmed wire instructions.",
       vendors: [
         { id: uid(), name: "Summit Escrow", role: "Escrow", contact: "team@summitescrow.example" },
         { id: uid(), name: "Redwood Sign Co.", role: "Sign Removal", contact: "206-555-0171" },
+        { id: uid(), name: "Hearth & Home Staging", role: "De-stage", contact: "253-555-0119" },
       ],
     }), [
-      "Listing Agreement (Form 1A)",
-      "WBC Disclosure Receipt",
-      "Listing Input Sheet (Form 1 or 10)",
-      "Seller Disclosure (Form 17)",
-      "FIRPTA Certification (Form 22E)",
-      "Identification of Utilities (Form 22K)",
-      "Pre-Inspection Scheduled",
-      "Sewer Scope Scheduled",
-      "Order Title Package",
-      "Sign Ordered",
-      "Cleaner Scheduled",
-      "Window Cleaning Scheduled",
-      "Staging Scheduled",
-      "Photo Shoot Appointment Set",
+      "Listing Agreement (Form 1A)", "WBC Disclosure Receipt",
+      "Listing Input Sheet (Form 1 or 10)", "Seller Disclosure (Form 17)",
+      "FIRPTA Certification (Form 22E)", "Identification of Utilities (Form 22K)",
+      "Pre-Inspection Scheduled", "Sewer Scope Scheduled", "Order Title Package",
+      "Sign Ordered", "Cleaner Scheduled", "Window Cleaning Scheduled",
+      "Staging Scheduled", "Photo Shoot Appointment Set",
+      "Add Listing to Supra & Lockbox Synced",
       "Photo shot list shared with photographer",
-      "Send Listing Paperwork to Office",
-      "Download MLS & Save in File",
-      "Verify Listing Docs Uploaded to MLS",
-      "Broker Open",
-      "Open House #1",
-      "Open House #2",
-      "Offers Reviewed",
-      "Mutual Acceptance Date",
-      "Sales Price Confirmed",
-      "Purchase & Sale Closing Date Set",
-      "Mutual Acceptance Procedure Reviewed",
+      "Send Listing Paperwork to Client", "Send Listing Paperwork to Office",
+      "Download MLS & Save in File", "Verify Listing Docs Uploaded to MLS",
+      "Broker Open", "Open House #1", "Open House #2",
+      "Offers Reviewed", "Mutual Acceptance Date", "Sales Price Confirmed",
+      "Purchase & Sale Closing Date Set", "Mutual Acceptance Procedure Reviewed",
+      "De-Staging Date Requested", "De-Staging Scheduled",
+      "Appraisal Date Set", "Appraisal Amount Confirmed",
+      "Sign Removal Requested", "Sign Removed",
+    ]),
+    setDone(freshListing({
+      property: "5902 Greenway Terrace, Issaquah",
+      seller: "Thomas & Hannah Nguyen",
+      mls: "2275003",
+      listPrice: "$1,125,000",
+      goLive: "09/08/2026",
+      openHouse1: "09/13/2026",
+      mutualAcceptance: "09/17/2026",
+      appraisalDate: "09/25/2026",
+      closingDate: "10/10/2026",
+      stage: "Closed",
+      notes: "Closed Oct 10 at $1,155,000 — $30k over ask. Sellers thrilled. Great candidate for referral testimonial. File fully audited and archived.",
+      vendors: [
+        { id: uid(), name: "Eastside Title Co.", role: "Title & Escrow", contact: "close@eastsidetitle.example" },
+      ],
+    }), [
+      "Listing Agreement (Form 1A)", "WBC Disclosure Receipt",
+      "Listing Input Sheet (Form 1 or 10)", "Seller Disclosure (Form 17)",
+      "FIRPTA Certification (Form 22E)", "Lead Disclosure (Form 22J)",
+      "Identification of Utilities (Form 22K)",
+      "Pre-Inspection Scheduled", "Sewer Scope Scheduled", "Order Title Package",
+      "Sign Ordered", "Cleaner Scheduled", "Window Cleaning Scheduled",
+      "Keys Made", "Staging Scheduled", "Photo Shoot Appointment Set",
+      "Add Listing to Supra & Lockbox Synced",
+      "Photo shot list shared with photographer",
+      "Send Title & Title Review to Client",
+      "Send Listing Paperwork to Client", "Send Listing Paperwork to Office",
+      "Send Preliminary Title to Office",
+      "Download MLS & Save in File", "Verify Listing Docs Uploaded to MLS",
+      "Update Client Status Sheet", "Create Email Documents Folder",
+      "Add Documents to Email Documents Folder",
+      "Broker Open", "Open House #1",
+      "Offers Reviewed", "Mutual Acceptance Date", "Sales Price Confirmed",
+      "Purchase & Sale Closing Date Set", "Mutual Acceptance Procedure Reviewed",
+      "De-Staging Date Requested", "De-Staging Scheduled",
+      "Appraisal Date Set", "Appraisal Amount Confirmed",
+      "Sign Removal Requested", "Sign Removed",
+      "Final File Audit",
+      "Staging Removal Note Sent", "Stager Confirmation Received",
+      "Client Communication Log Updated", "Closing Reminders Sent",
     ]),
   ];
 }
@@ -703,18 +792,60 @@ const PHASE_SECTIONS = {
   "Pending/Close": ["Pending to Closing", "Notes & Communication"],
 };
 
-function loadState() {
+/* ---------- Persistence: KV API + localStorage fallback ---------- */
+const API = "/api/state";
+
+function loadStateLocal() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch (e) { /* corrupted or unavailable — fall through to defaults */ }
-  return {
-    teamName: "Casa",
-    theme: "light",
-    view: { screen: "dashboard", listingId: null },
-    listings: sampleListings(),
-  };
+  } catch (e) {}
+  return null;
 }
+
+function saveStateLocal(s) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {}
+}
+
+async function loadStateRemote() {
+  try {
+    const res = await fetch(API);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data;
+  } catch (e) { return null; }
+}
+
+async function saveStateRemote(s) {
+  try {
+    await fetch(API, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(s),
+    });
+  } catch (e) {}
+}
+
+function saveState() {
+  saveStateLocal(state);
+  saveStateRemote(state);
+}
+
+let state = migrateState(loadStateLocal());
+saveStateLocal(state);
+
+// Async hydrate from KV then re-render
+(async () => {
+  const remote = await loadStateRemote();
+  if (remote && remote.listings && remote.listings.length > 0) {
+    state = migrateState(remote);
+    saveStateLocal(state);
+  } else if (!state.listings || state.listings.length === 0) {
+    state.listings = sampleListings();
+    saveState();
+  }
+  render();
+})();
 
 function migrateState(rawState) {
   const next = rawState || {};
@@ -747,14 +878,6 @@ function migrateState(rawState) {
   }));
   return next;
 }
-
-function saveState() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-  catch (e) { console.error("Could not save:", e); }
-}
-
-let state = migrateState(loadState());
-saveState();
 
 /* ---------- Derived helpers ---------- */
 function progress(listing) {

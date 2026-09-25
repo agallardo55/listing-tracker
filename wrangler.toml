@@ -1,0 +1,7 @@
+name = "casa-listing-tracker"
+pages_build_output_dir = "."
+compatibility_date = "2024-09-23"
+
+[[kv_namespaces]]
+binding = "CASA_STATE"
+id = "4cd73f8580b3457da025a7acf92b1231"
