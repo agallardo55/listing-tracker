@@ -145,7 +145,84 @@
     line-height: 1.45;
     min-height: 100vh;
   }
-  #app { max-width: 1220px; margin: 0 auto; padding: 0 18px 88px; position: relative; }
+  #app { max-width: none; margin: 0; padding: 0; position: relative; }
+
+  /* ======= Sidebar Navigation Layout ======= */
+  .app-shell { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 240px; flex-shrink: 0; position: sticky; top: 0;
+    height: 100vh; overflow-y: auto;
+    background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; z-index: 30;
+    transition: transform 0.22s ease;
+  }
+  .sidebar-brand {
+    padding: 20px 16px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  }
+  .sidebar-brand .brand-emoji { font-size: 26px; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(31,111,139,0.18)); }
+  .sidebar-brand-name-input {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 22px; font-weight: 500; letter-spacing: -0.04em;
+    background: transparent; border: none; color: var(--brand);
+    border-bottom: 1px dashed transparent; padding: 0;
+    min-width: 80px; max-width: 155px; width: 100%;
+  }
+  .sidebar-brand-name-input:hover, .sidebar-brand-name-input:focus { border-bottom-color: var(--border); outline: none; }
+
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 3px; }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+    border-radius: 12px; font-size: 14px; font-weight: 650;
+    color: var(--muted); background: transparent; border: none;
+    cursor: pointer; text-align: left; width: 100%; box-shadow: none;
+    transition: background 0.12s, color 0.12s; font-family: inherit;
+  }
+  .sidebar-item:hover { background: var(--surface-2); color: var(--text); }
+  .sidebar-item.active {
+    background: var(--accent-soft); color: var(--brand);
+    box-shadow: inset 3px 0 0 var(--accent); font-weight: 750;
+  }
+  .sidebar-item .s-icon { font-size: 16px; flex-shrink: 0; }
+
+  .sidebar-footer { padding: 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .sidebar-theme-btn {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    border-radius: 12px; font-size: 14px; font-weight: 650;
+    color: var(--muted); background: transparent; border: none;
+    cursor: pointer; width: 100%; text-align: left; font-family: inherit;
+  }
+  .sidebar-theme-btn:hover { background: var(--surface-2); color: var(--text); }
+
+  .main { flex: 1; min-width: 0; padding: 0 24px 88px; }
+  .main .promo-bar { margin: 0 -24px 0; padding: 12px 24px; }
+
+  .content-topbar {
+    display: flex; align-items: center; padding: 10px 0 6px; margin-bottom: 0;
+  }
+  .hamburger-btn {
+    display: none; align-items: center; justify-content: center;
+    background: var(--surface-2); border-radius: 10px;
+    padding: 7px 10px; font-size: 20px; color: var(--text); border: none;
+    cursor: pointer; line-height: 1;
+  }
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,12,10,.38); z-index: 29;
+  }
+  .sidebar-backdrop.open { display: block; }
+
+  @media (max-width: 900px) {
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      transform: translateX(-100%); z-index: 40; height: 100dvh;
+    }
+    .sidebar.open { transform: translateX(0); box-shadow: 4px 0 32px rgba(0,0,0,0.18); }
+    .main { padding-left: 18px; padding-right: 18px; }
+    .main .promo-bar { margin: 0 -18px 0; padding: 12px 18px; }
+    .hamburger-btn { display: flex; }
+  }
 
 
   h1, h2, h3 { font-weight: 650; letter-spacing: -0.02em; margin: 0; }
@@ -681,42 +758,69 @@ const app = document.getElementById("app");
 function render() {
   if (state.theme !== "light" && state.theme !== "dark") state.theme = "light";
   document.documentElement.setAttribute("data-theme", state.theme);
+  let content;
   if (state.view.screen === "detail") {
-    app.innerHTML = renderDetail(state.listings.find(l => l.id === state.view.listingId));
+    content = renderDetail(state.listings.find(l => l.id === state.view.listingId));
   } else if (state.view.screen === "checklist") {
-    app.innerHTML = renderChecklistScreen(state.listings.find(l => l.id === state.view.listingId));
+    content = renderChecklistScreen(state.listings.find(l => l.id === state.view.listingId));
   } else if (state.view.screen === "timeline") {
-    app.innerHTML = renderTimeline(state.listings.find(l => l.id === state.view.listingId));
+    content = renderTimeline(state.listings.find(l => l.id === state.view.listingId));
   } else if (state.view.screen === "settings") {
-    app.innerHTML = renderSettings();
+    content = renderSettings();
   } else {
-    app.innerHTML = renderDashboard();
+    content = renderDashboard();
   }
+  app.innerHTML = `
+    <div class="app-shell">
+      ${renderSidebar()}
+      <div class="main" id="mainContent">
+        ${content}
+      </div>
+    </div>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>`;
   bindEvents();
 }
 
 function renderTopbar() {
-  const active = state.view.screen || "dashboard";
   return `
     <div class="promo-bar desktop-only">Every listing, one calm dashboard — <strong>Casa keeps your team in sync</strong></div>
-    <div class="topbar">
-      <div class="brand">
-        <span class="brand-emoji">🏡</span>
-        <div>
-          <input class="brand-name-input" id="teamNameInput" value="${esc(state.teamName)}" />
-          <div class="brand-sub">Listing workflow dashboard</div>
-        </div>
-      </div>
-      <nav class="nav-links desktop-only">
-        <span>▦ Listings</span>
-        <span>✓ Checklist</span>
-        <span>◷ Timeline</span>
-        <span>⚙ Settings</span>
-      </nav>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button class="icon-btn theme-toggle" id="themeToggle" title="Toggle theme">${state.theme === "dark" ? "☀️" : "🌙"}</button>
-      </div>
+    <div class="content-topbar">
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation" title="Open navigation">☰</button>
     </div>`;
+}
+
+function renderSidebar() {
+  const screen = state.view.screen || "dashboard";
+  const isListings = screen === "dashboard" || screen === "detail";
+  const items = [
+    { tab: "dashboard", icon: "▦", label: "Listings",  active: isListings },
+    { tab: "checklist", icon: "✓", label: "Checklist", active: screen === "checklist" },
+    { tab: "timeline",  icon: "◷", label: "Timeline",  active: screen === "timeline" },
+    { tab: "settings",  icon: "⚙", label: "Settings",  active: screen === "settings" },
+  ];
+  const navItems = items.map(item => `
+    <button class="sidebar-item${item.active ? " active" : ""}" data-tab="${item.tab}"
+      aria-current="${item.active ? "page" : "false"}">
+      <span class="s-icon">${item.icon}</span>
+      <span>${item.label}</span>
+    </button>`).join("");
+  return `
+    <aside class="sidebar" id="appSidebar" aria-label="Primary navigation">
+      <div class="sidebar-brand">
+        <span class="brand-emoji">🏡</span>
+        <input class="sidebar-brand-name-input" id="teamNameInput"
+          value="${esc(state.teamName)}" aria-label="Team name" />
+      </div>
+      <nav class="sidebar-nav" aria-label="Primary">
+        ${navItems}
+      </nav>
+      <div class="sidebar-footer">
+        <button class="sidebar-theme-btn" id="themeToggle" title="Toggle theme">
+          <span>${state.theme === "dark" ? "☀️" : "🌙"}</span>
+          <span>${state.theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+        </button>
+      </div>
+    </aside>`;
 }
 
 function listingPhase(listing) {
@@ -940,6 +1044,26 @@ function renderSettings() {
 
 /* ---------- Event binding ---------- */
 function bindEvents() {
+  // hamburger / sidebar drawer
+  const hamburger = document.getElementById("hamburgerBtn");
+  const sidebar = document.getElementById("appSidebar");
+  const backdrop = document.getElementById("sidebarBackdrop");
+  function openSidebar() {
+    if (sidebar) sidebar.classList.add("open");
+    if (backdrop) backdrop.classList.add("open");
+    if (hamburger) hamburger.setAttribute("aria-expanded", "true");
+  }
+  function closeSidebar() {
+    if (sidebar) sidebar.classList.remove("open");
+    if (backdrop) backdrop.classList.remove("open");
+    if (hamburger) hamburger.setAttribute("aria-expanded", "false");
+  }
+  if (hamburger) hamburger.addEventListener("click", openSidebar);
+  if (backdrop) backdrop.addEventListener("click", closeSidebar);
+  document.addEventListener("keydown", function escHandler(e) {
+    if (e.key === "Escape") closeSidebar();
+  }, { once: true });
+
   const teamNameInput = document.getElementById("teamNameInput");
   if (teamNameInput) teamNameInput.addEventListener("change", e => { state.teamName = e.target.value; saveState(); });
 
@@ -966,6 +1090,7 @@ function bindEvents() {
       } else {
         state.view = { screen: tab, listingId: state.view.listingId, dashboardPhase: state.view.dashboardPhase || "Prep" };
       }
+      closeSidebar();
       saveState(); render();
     });
   });
