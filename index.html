@@ -408,6 +408,33 @@
 
   .notes-card { padding: 20px; margin-top: 14px; }
 
+  /* Notes log */
+  .notes-compose { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+  .notes-compose textarea {
+    width: 100%; min-height: 72px; resize: vertical;
+    font: inherit; font-size: 13.5px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  }
+  .notes-compose textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .notes-compose-actions { display: flex; justify-content: flex-end; }
+  .notes-log { display: flex; flex-direction: column; gap: 0; }
+  .note-entry {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 8px; padding: 14px 0; border-top: 1px solid var(--border);
+    align-items: start;
+  }
+  .note-entry:first-child { border-top: none; }
+  .note-ts { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; margin-top: 2px; }
+  .note-text {
+    font-size: 13.5px; color: var(--text); line-height: 1.5;
+    white-space: pre-wrap; word-break: break-word; cursor: pointer;
+  }
+  .note-text[contenteditable="true"] {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+    padding: 4px 6px; background: var(--surface);
+  }
+  .note-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(10,12,10,0.45);
     display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50;
@@ -570,7 +597,7 @@ function freshListing(overrides) {
     appraisalDate: "",
     closingDate: "",
     stage: "Listing Signed",
-    notes: "",
+    notes: [],
     vendors: [],
     checklist: freshChecklist(),
   }, overrides || {});
@@ -593,7 +620,7 @@ function sampleListings() {
       listPrice: "$1,045,000",
       goLive: "10/18/2026",
       stage: "Prep",
-      notes: "Seller reviewing disclosures. Sign location confirmed. Staging consult booked for Oct 10 — Hearth & Home recommends full living room and master.",
+      notes: [{ id: "s1a", text: "Seller reviewing disclosures. Sign location confirmed. Staging consult booked for Oct 10 — Hearth & Home recommends full living room and master.", ts: 1727740800000 }],
       vendors: [
         { id: uid(), name: "Cascade Sewer Scope", role: "Sewer Scope", contact: "dispatch@cascade.example" },
         { id: uid(), name: "Hearth & Home Staging", role: "Staging Consult", contact: "253-555-0119" },
@@ -617,7 +644,7 @@ function sampleListings() {
       listPrice: "$1,180,000",
       goLive: "10/25/2026",
       stage: "Listing Signed",
-      notes: "New construction — builder selling direct. Need pre-inspection waiver reviewed. Sellers traveling until Oct 8; all comms via email.",
+      notes: [{ id: "s2a", text: "New construction — builder selling direct. Need pre-inspection waiver reviewed. Sellers traveling until Oct 8; all comms via email.", ts: 1727654400000 }],
       vendors: [
         { id: uid(), name: "Meridian Inspections", role: "Pre-Inspection", contact: "425-555-0234" },
         { id: uid(), name: "Gold Key Title", role: "Title", contact: "goldkey@title.example" },
@@ -638,7 +665,10 @@ function sampleListings() {
       openHouse1: "10/05/2026",
       openHouse2: "10/06/2026",
       stage: "MLS Live",
-      notes: "Premium listing. Staging complete, photography delivered. Seller wants daily traffic reports. 14 showings in first 3 days — strong interest from 2 buyers.",
+      notes: [
+        { id: "s3a", text: "Premium listing. Staging complete, photography delivered. Seller wants daily traffic reports.", ts: 1727481600000 },
+        { id: "s3b", text: "14 showings in first 3 days — strong interest from 2 buyers. Agent from Windermere requested second showing for Sat.", ts: 1727654400000 },
+      ],
       vendors: [
         { id: uid(), name: "BrightFrame Photo", role: "Photography", contact: "photos@brightframe.example" },
         { id: uid(), name: "Evergreen Staging", role: "Staging", contact: "206-555-0148" },
@@ -664,7 +694,7 @@ function sampleListings() {
       goLive: "10/11/2026",
       openHouse1: "10/12/2026",
       stage: "Photos",
-      notes: "Waterfront-adjacent. Photos delivered Oct 9. Open house drew 22 groups. Offer review set for Oct 14 at 5pm. Expect 4–6 offers.",
+      notes: [{ id: "s4a", text: "Waterfront-adjacent. Photos delivered Oct 9. Open house drew 22 groups. Offer review set for Oct 14 at 5pm. Expect 4–6 offers.", ts: 1728518400000 }],
       vendors: [
         { id: uid(), name: "Northwest Clean Co.", role: "Cleaning", contact: "425-555-0182" },
         { id: uid(), name: "Skyline Media", role: "Photography", contact: "hello@skylinemedia.example" },
@@ -690,7 +720,10 @@ function sampleListings() {
       openHouse2: "09/30/2026",
       mutualAcceptance: "10/07/2026",
       stage: "Pending",
-      notes: "Received 5 offers. Accepted $835,000 — $36k over ask, no inspection contingency. Mutual acceptance signed Oct 7. Appraisal ordered.",
+      notes: [
+        { id: "s5a", text: "Received 5 offers. Accepted $835,000 — $36k over ask, no inspection contingency.", ts: 1728086400000 },
+        { id: "s5b", text: "Mutual acceptance signed Oct 7. Appraisal ordered. Escrow opened with Pacific.", ts: 1728259200000 },
+      ],
       vendors: [
         { id: uid(), name: "Sound Title Group", role: "Title", contact: "425-555-0301" },
         { id: uid(), name: "Pacific Escrow", role: "Escrow", contact: "pe@pacific.example" },
@@ -723,7 +756,10 @@ function sampleListings() {
       appraisalDate: "10/04/2026",
       closingDate: "10/24/2026",
       stage: "Pending",
-      notes: "Appraisal came in at value ($735k). Financing contingency cleared Oct 12. Final walkthrough Oct 23. Closing Oct 24 at Summit Escrow — seller confirmed wire instructions.",
+      notes: [
+        { id: "s6a", text: "Appraisal came in at value ($735k). Financing contingency cleared Oct 12.", ts: 1728777600000 },
+        { id: "s6b", text: "Final walkthrough Oct 23. Closing Oct 24 at Summit Escrow — seller confirmed wire instructions.", ts: 1729036800000 },
+      ],
       vendors: [
         { id: uid(), name: "Summit Escrow", role: "Escrow", contact: "team@summitescrow.example" },
         { id: uid(), name: "Redwood Sign Co.", role: "Sign Removal", contact: "206-555-0171" },
@@ -758,7 +794,10 @@ function sampleListings() {
       appraisalDate: "09/25/2026",
       closingDate: "10/10/2026",
       stage: "Closed",
-      notes: "Closed Oct 10 at $1,155,000 — $30k over ask. Sellers thrilled. Great candidate for referral testimonial. File fully audited and archived.",
+      notes: [
+        { id: "s7a", text: "Closed Oct 10 at $1,155,000 — $30k over ask. Sellers thrilled.", ts: 1728518400000 },
+        { id: "s7b", text: "Great candidate for referral testimonial. File fully audited and archived.", ts: 1728604800000 },
+      ],
       vendors: [
         { id: uid(), name: "Eastside Title Co.", role: "Title & Escrow", contact: "close@eastsidetitle.example" },
       ],
@@ -878,14 +917,25 @@ function migrateState(rawState) {
     && next.listings[0].property === "123 Example St, Sample City"
     && String(next.listings[0].seller || "").startsWith("Sample Seller");
   if (hasOnlyOldPlaceholder) next.listings = sampleListings();
-  next.listings = next.listings.map(l => Object.assign({
-    id: uid(), property: "", seller: "", mls: "", listPrice: "",
-    goLive: "", openHouse1: "", openHouse2: "", mutualAcceptance: "", appraisalDate: "", closingDate: "",
-    stage: "Listing Signed", notes: "", vendors: [], checklist: freshChecklist(),
-  }, l, {
-    vendors: Array.isArray(l.vendors) ? l.vendors : [],
-    checklist: Array.isArray(l.checklist) ? l.checklist : freshChecklist(),
-  }));
+  next.listings = next.listings.map(l => {
+    const base = {
+      id: uid(), property: "", seller: "", mls: "", listPrice: "",
+      goLive: "", openHouse1: "", openHouse2: "", mutualAcceptance: "", appraisalDate: "", closingDate: "",
+      stage: "Listing Signed", notes: [], vendors: [], checklist: freshChecklist(),
+    };
+    const merged = Object.assign(base, l, {
+      vendors: Array.isArray(l.vendors) ? l.vendors : [],
+      checklist: Array.isArray(l.checklist) ? l.checklist : freshChecklist(),
+    });
+    // Migrate old string notes → log entry
+    if (typeof merged.notes === "string") {
+      merged.notes = merged.notes.trim()
+        ? [{ id: uid(), text: merged.notes.trim(), ts: Date.now() }]
+        : [];
+    }
+    if (!Array.isArray(merged.notes)) merged.notes = [];
+    return merged;
+  });
   return next;
 }
 
@@ -1074,6 +1124,38 @@ function renderBottomTabs() {
     </nav>`;
 }
 
+function fmtTs(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    + " · " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+function renderNotesLog(listing) {
+  const entries = [...(listing.notes || [])].reverse(); // newest first
+  const rows = entries.length
+    ? entries.map(n => `
+      <div class="note-entry" data-note-id="${esc(n.id)}">
+        <div>
+          <div class="note-ts">${fmtTs(n.ts)}</div>
+          <div class="note-text" data-note-text="${esc(n.id)}">${esc(n.text)}</div>
+        </div>
+        <div class="note-actions">
+          <button class="icon-btn btn-sm" data-note-delete="${esc(n.id)}" title="Delete note">✕</button>
+        </div>
+      </div>`).join("")
+    : `<div style="padding:20px 0; color:var(--muted); font-size:13.5px;">No notes yet — add the first one above.</div>`;
+  return `
+    <div class="card notes-card">
+      <div class="notes-compose">
+        <textarea id="noteInput" placeholder="Add a note…"></textarea>
+        <div class="notes-compose-actions">
+          <button class="btn-primary btn-sm" id="noteSubmitBtn">Add Note</button>
+        </div>
+      </div>
+      <div class="notes-log">${rows}</div>
+    </div>`;
+}
+
 function renderDetail(listing) {
   if (!listing) { state.view = { screen: "dashboard", listingId: null }; return renderDashboard(); }
   const p = progress(listing);
@@ -1116,11 +1198,7 @@ function renderDetail(listing) {
         `<button class="phase-tab ${tab === activeDetailTab ? "active" : ""}" data-detail-phase-tab="${esc(tab)}">${esc(tab)}</button>`
       ).join("")}</div>`;
       const body = activeDetailTab === "Notes"
-        ? `<div class="card notes-card">
-            <div class="field"><label>Notes</label>
-              <textarea id="f_notes" placeholder="Communication log, anything worth remembering...">${esc(listing.notes)}</textarea>
-            </div>
-          </div>`
+        ? renderNotesLog(listing)
         : `<div class="detail-phase-cards">${renderChecklistSections(listing, activeDetailTab)}</div>`;
       return tabs + body;
     })()}
@@ -1334,6 +1412,69 @@ function bindEvents() {
     saveState(); render();
   });
 
+  // Notes log: submit
+  const noteSubmitBtn = document.getElementById("noteSubmitBtn");
+  const noteInput = document.getElementById("noteInput");
+  if (noteSubmitBtn && noteInput) {
+    const submit = () => {
+      const text = noteInput.value.trim();
+      if (!text) return;
+      const listing = currentListing();
+      if (!listing) return;
+      if (!Array.isArray(listing.notes)) listing.notes = [];
+      listing.notes.push({ id: uid(), text, ts: Date.now() });
+      saveState(); render();
+    };
+    noteSubmitBtn.addEventListener("click", submit);
+    noteInput.addEventListener("keydown", e => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submit(); }
+    });
+  }
+
+  // Notes log: inline edit (click text → contenteditable, blur → save)
+  document.querySelectorAll("[data-note-text]").forEach(el => {
+    el.addEventListener("click", () => {
+      if (el.contentEditable === "true") return;
+      el.contentEditable = "true";
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    });
+    el.addEventListener("blur", () => {
+      el.contentEditable = "false";
+      const listing = currentListing();
+      if (!listing) return;
+      const noteId = el.getAttribute("data-note-text");
+      const note = listing.notes.find(n => n.id === noteId);
+      if (note) {
+        const newText = el.textContent.trim();
+        if (newText && newText !== note.text) {
+          note.text = newText;
+          note.ts = Date.now(); // bump timestamp on edit
+          saveState();
+        }
+      }
+    });
+    el.addEventListener("keydown", e => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); el.blur(); }
+      if (e.key === "Escape") { el.contentEditable = "false"; render(); }
+    });
+  });
+
+  // Notes log: delete
+  document.querySelectorAll("[data-note-delete]").forEach(el => {
+    el.addEventListener("click", () => {
+      const listing = currentListing();
+      if (!listing) return;
+      const noteId = el.getAttribute("data-note-delete");
+      listing.notes = listing.notes.filter(n => n.id !== noteId);
+      saveState(); render();
+    });
+  });
+
   const addBtn = document.getElementById("addListingBtn");
   if (addBtn) addBtn.addEventListener("click", openAddModal);
 
@@ -1389,7 +1530,6 @@ function bindEvents() {
   bindFieldInput("f_mutualAcceptance", "mutualAcceptance");
   bindFieldInput("f_appraisalDate", "appraisalDate");
   bindFieldInput("f_closingDate", "closingDate");
-  bindFieldInput("f_notes", "notes");
 
   const addVendorBtn = document.getElementById("addVendorBtn");
   if (addVendorBtn) addVendorBtn.addEventListener("click", () => {
