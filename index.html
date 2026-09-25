@@ -366,6 +366,31 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 15px 20px; cursor: pointer; user-select: none;
   }
+
+  /* Checklist index-card tab strip */
+  .cl-tabs {
+    display: flex; gap: 0; overflow-x: auto; padding-bottom: 0;
+    border-bottom: none; margin-bottom: -1px; position: relative; z-index: 1;
+    scrollbar-width: none;
+  }
+  .cl-tabs::-webkit-scrollbar { display: none; }
+  .cl-tab {
+    flex-shrink: 0; padding: 9px 15px; font-size: 12.5px; font-weight: 750;
+    border-radius: 10px 10px 0 0; border: 1px solid var(--border);
+    border-bottom: none; background: var(--surface-2); color: var(--muted);
+    cursor: pointer; position: relative; bottom: 0; margin-right: -1px;
+    transition: background 0.12s, color 0.12s; white-space: nowrap;
+  }
+  .cl-tab.active {
+    background: var(--surface); color: var(--brand); font-weight: 800;
+    border-bottom: 1px solid var(--surface);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .cl-tab .cl-tab-pct { opacity: .72; font-size: 11px; margin-left: 4px; }
+  .cl-card-body {
+    border: 1px solid var(--border); border-radius: 0 14px 14px 14px;
+    background: var(--surface); overflow: hidden;
+  }
   .section-head:hover { background: rgba(31,111,139,0.06); }
   .section-title { font-size: 15px; font-weight: 750; }
   .section-meta { font-size: 12.5px; color: var(--muted); }
@@ -709,6 +734,10 @@ function migrateState(rawState) {
   if (!DETAIL_TABS.includes(next.view.detailPhase)) {
     next.view.detailPhase = "Prep";
   }
+  const sectionNames = (CHECKLIST_TEMPLATE || []).map(s => s.section);
+  if (!sectionNames.includes(next.view.checklistSection)) {
+    next.view.checklistSection = sectionNames[0] || null;
+  }
   delete next.view.phase;
   if (!Array.isArray(next.listings)) next.listings = [];
   const hasOnlyOldPlaceholder = next.listings.length === 1
@@ -977,11 +1006,46 @@ function renderListingScopedEmpty(screenName) {
 
 function renderChecklistScreen(listing) {
   if (!listing) return renderListingScopedEmpty("checklist");
+  const sectionNames = CHECKLIST_TEMPLATE.map(s => s.section);
+  const activeSec = sectionNames.includes(state.view.checklistSection)
+    ? state.view.checklistSection : sectionNames[0];
+
+  const tabs = sectionNames.map(sec => {
+    const tasks = listing.checklist.filter(t => t.section === sec);
+    const done = tasks.filter(t => t.done).length;
+    const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+    return `<button class="cl-tab ${sec === activeSec ? "active" : ""}" data-checklist-tab="${esc(sec)}">
+      ${esc(sec.replace("+ ", "+\u200B"))}
+      <span class="cl-tab-pct">${pct}%</span>
+    </button>`;
+  }).join("");
+
+  const activeTasks = listing.checklist.filter(t => t.section === activeSec);
+  const doneCount = activeTasks.filter(t => t.done).length;
+  const taskRows = activeTasks.map(t => `
+    <div class="task-row ${t.done ? "done" : ""}">
+      <input type="checkbox" class="task-check" data-task="${t.id}" ${t.done ? "checked" : ""} />
+      <div>
+        <div class="task-name ${t.done ? "strike" : ""}">${esc(t.name)}</div>
+        <div class="task-tags">
+          <span class="tag tag-priority-${t.priority.toLowerCase()}">${esc(t.priority)}</span>
+          <span class="tag tag-owner">${esc(t.owner)}</span>
+        </div>
+      </div>
+    </div>`).join("");
+
   return `
     ${renderTopbar()}
     <button class="back-link" id="backBtn">← All listings</button>
     <div class="toolbar"><h2>✅ Checklist</h2><span class="sub">${esc(listing.property) || "Untitled listing"}</span></div>
-    ${renderChecklistSections(listing)}
+    <div class="cl-tabs">${tabs}</div>
+    <div class="cl-card-body">
+      <div class="section-head" style="cursor:default;">
+        <div class="section-title">${esc(activeSec)}</div>
+        <div class="section-meta">${doneCount}/${activeTasks.length} done</div>
+      </div>
+      <div class="task-list">${taskRows}</div>
+    </div>
     ${renderBottomTabs()}
   `;
 }
@@ -1109,6 +1173,13 @@ function bindEvents() {
       const phase = el.getAttribute("data-detail-phase-tab");
       if (!DETAIL_TABS.includes(phase)) return;
       state.view.detailPhase = phase;
+      saveState(); render();
+    });
+  });
+
+  document.querySelectorAll("[data-checklist-tab]").forEach(el => {
+    el.addEventListener("click", () => {
+      state.view.checklistSection = el.getAttribute("data-checklist-tab");
       saveState(); render();
     });
   });
