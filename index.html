@@ -197,6 +197,56 @@
   .main { flex: 1; min-width: 0; padding: 34px 40px 88px; }
   .main .promo-bar { margin: 0 -40px 0; padding: 12px 40px; }
 
+  /* ======= Casa Copilot right rail ======= */
+  .copilot {
+    width: 372px; flex: 0 0 372px; height: 100vh; position: sticky; top: 0;
+    border-left: 1px solid var(--border); background: var(--surface);
+    display: flex; flex-direction: column; z-index: 25;
+    transition: width .18s ease, flex-basis .18s ease, transform .18s ease;
+  }
+  .copilot.collapsed { width: 64px; flex-basis: 64px; }
+  .copilot-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 18px 16px 12px; border-bottom: 1px solid var(--border);
+  }
+  .copilot-title { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .copilot-name { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 600; color: var(--text); }
+  .copilot-actions { display: flex; gap: 6px; }
+  .copilot-icon-btn { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; border-radius: 10px; background: var(--surface-2); color: var(--text); }
+  .copilot-body { overflow-y: auto; padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+  .copilot-context {
+    border: 1px solid var(--border); background: var(--surface-2); border-radius: 14px;
+    padding: 12px; font-size: 12.5px; color: var(--muted);
+  }
+  .copilot-context strong { display: block; color: var(--text); font-size: 14px; margin: 3px 0; }
+  .copilot-context-grid { display: grid; gap: 4px; margin-top: 8px; }
+  .copilot-pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .copilot-pill { padding: 4px 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 700; }
+  .copilot-quick { display: grid; gap: 8px; }
+  .copilot-quick-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .copilot-quick button { text-align: left; border-radius: 12px; background: var(--surface-2); color: var(--text); padding: 10px 12px; font-size: 13px; }
+  .copilot-quick button:hover { background: var(--accent-soft); color: var(--accent); }
+  .copilot-chat { display: grid; gap: 10px; }
+  .copilot-msg { max-width: 92%; border-radius: 14px; padding: 10px 12px; font-size: 13px; line-height: 1.45; white-space: pre-wrap; }
+  .copilot-msg.casa { background: var(--surface-2); color: var(--text); justify-self: start; }
+  .copilot-msg.agent { background: var(--accent); color: #fff; justify-self: end; }
+  .copilot-input-wrap { border-top: 1px solid var(--border); padding: 12px; background: var(--surface); }
+  .copilot-input-label { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .copilot-input-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+  .copilot-input {
+    width: 100%; min-height: 42px; max-height: 120px; resize: vertical;
+    border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
+    font: inherit; font-size: 13px; background: var(--surface-2); color: var(--text);
+  }
+  .copilot-send { width: 42px; height: 42px; padding: 0; border-radius: 14px; background: var(--accent); color: #fff; }
+  .copilot.collapsed .copilot-body,
+  .copilot.collapsed .copilot-input-wrap,
+  .copilot.collapsed .copilot-title,
+  .copilot.collapsed .copilot-name,
+  .copilot.collapsed .copilot-actions .copilot-new { display: none; }
+  .copilot.collapsed .copilot-header { justify-content: center; padding: 14px 8px; border-bottom: none; }
+  .copilot-mobile-fab { display: none; }
+
   .content-topbar { display: flex; align-items: center; padding: 0 0 8px; margin-bottom: 0; }
   .hamburger-btn {
     display: none; align-items: center; justify-content: center;
@@ -219,6 +269,21 @@
     .main { padding: 20px 18px 88px; }
     .main .promo-bar { margin: 0 -18px 0; padding: 12px 18px; }
     .hamburger-btn { display: flex; }
+    .copilot {
+      position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+      width: 100%; height: min(78vh, 680px); flex-basis: auto;
+      border-left: none; border-top: 1px solid var(--border);
+      border-radius: 18px 18px 0 0;
+      transform: translateY(110%); z-index: 45;
+      box-shadow: 0 -12px 38px rgba(35,35,56,.18);
+    }
+    .copilot:not(.collapsed) { transform: translateY(0); }
+    .copilot.collapsed { width: 100%; flex-basis: auto; transform: translateY(110%); }
+    .copilot.collapsed .copilot-header { display: none; }
+    .copilot-mobile-fab {
+      display: block; position: fixed; right: 16px; bottom: 78px; z-index: 44;
+      background: var(--accent); color: #fff; box-shadow: 0 8px 22px rgba(124,95,196,.26);
+    }
   }
 
 
@@ -905,6 +970,11 @@ function migrateState(rawState) {
   if (!next.teamName || next.teamName === "Your Real Estate Business") next.teamName = "Casa";
   if (next.theme !== "light" && next.theme !== "dark") next.theme = "light";
   if (!next.view || !next.view.screen) next.view = { screen: "dashboard", listingId: null };
+  if (!next.copilot || typeof next.copilot !== "object") {
+    next.copilot = { open: true, messages: [] };
+  }
+  if (typeof next.copilot.open !== "boolean") next.copilot.open = true;
+  if (!Array.isArray(next.copilot.messages)) next.copilot.messages = [];
   if (!PHASES.includes(next.view.dashboardPhase)) {
     next.view.dashboardPhase = PHASES.includes(next.view.phase) ? next.view.phase : "Prep";
   }
@@ -985,7 +1055,9 @@ function render() {
       <div class="main" id="mainContent">
         ${content}
       </div>
+      ${renderCopilot()}
     </div>
+    <button class="copilot-mobile-fab" id="copilotMobileFab">Casa</button>
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>`;
   bindEvents();
 }
@@ -1034,6 +1106,94 @@ function renderSidebar() {
           <span class="s-icon">${themeIcon}</span>
           <span>${state.theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
         </button>
+      </div>
+    </aside>`;
+}
+
+function copilotContext() {
+  const listing = currentListing() || state.listings[0] || null;
+  const screen = state.view.screen || "dashboard";
+  const phase = listing ? listingPhase(listing) : "No listing selected";
+  const p = listing ? progress(listing) : null;
+  return { listing, screen, phase, progress: p };
+}
+
+function copilotSuggestions(ctx) {
+  if (ctx.screen === "detail") return ["What should I do next?", "Review this listing", "What am I missing?", "Explain earnest money"];
+  if (ctx.screen === "checklist") return ["Review my checklist", "What is incomplete?", "Which items are urgent?", "Prepare listing documents"];
+  if (ctx.screen === "timeline") return ["What's due next?", "Show upcoming deadlines", "Explain mutual acceptance", "Review closing timeline"];
+  if (ctx.screen === "settings") return ["Review vendor coverage", "What vendors are missing?", "Explain transaction coordinator", "Help organize this file"];
+  return ["What should I do next?", "Which listings need attention?", "Show upcoming deadlines", "Review listing readiness"];
+}
+
+function copilotReply(prompt) {
+  const ctx = copilotContext();
+  const listing = ctx.listing;
+  const lower = prompt.toLowerCase();
+  if (!listing) return "I don't have a listing selected yet. Open or create a listing so I can use its context.";
+  const openTasks = listing.checklist.filter(t => !t.done);
+  const highOpen = openTasks.filter(t => t.priority === "High");
+  const dates = [
+    ["Go-Live", listing.goLive], ["Open House #1", listing.openHouse1], ["Open House #2", listing.openHouse2],
+    ["Mutual Acceptance", listing.mutualAcceptance], ["Appraisal", listing.appraisalDate], ["Closing", listing.closingDate],
+  ].filter(([, d]) => d);
+  if (lower.includes("missing") || lower.includes("incomplete") || lower.includes("review")) {
+    return `For ${listing.property}, I see ${openTasks.length} open checklist items. ${highOpen.length ? `${highOpen.length} are high priority: ${highOpen.slice(0, 4).map(t => t.name).join("; ")}.` : "No high-priority checklist items are currently open."}\n\nGuardrail: confirm contract/document decisions with your managing broker when the source file is incomplete.`;
+  }
+  if (lower.includes("due") || lower.includes("deadline") || lower.includes("timeline")) {
+    return dates.length
+      ? `Tracked dates for ${listing.property}:\n${dates.map(([name, date]) => `• ${name}: ${date}`).join("\n")}\n\nI can only use dates already stored in Casa; I won't infer contract deadlines without the transaction inputs.`
+      : `I don't see any timeline dates stored for ${listing.property} yet. Add go-live, open house, mutual acceptance, appraisal, or closing dates first.`;
+  }
+  if (lower.includes("earnest money")) {
+    return "Earnest money is money the buyer deposits after an offer is accepted to show they intend to complete the purchase. The purchase agreement controls when it must be deposited, who holds it, and what happens if the transaction does not close.";
+  }
+  if (lower.includes("form") || lower.includes("document") || lower.includes("offer")) {
+    return "V1 document guidance is scaffolded only. Recommended next step: build a Washington Residential Buyer Offer transaction object, then map supported fields to document definitions. Casa should validate structured data before any document is generated — not let AI directly edit PDFs.";
+  }
+  return `I'm looking at ${listing.property} (${ctx.phase}). Next practical step: handle the highest-priority open checklist item: ${highOpen[0]?.name || openTasks[0]?.name || "the listing looks complete in the current checklist"}.`;
+}
+
+function renderCopilot() {
+  const ctx = copilotContext();
+  const listing = ctx.listing;
+  const open = state.copilot?.open !== false;
+  const messages = state.copilot?.messages || [];
+  const suggestions = copilotSuggestions(ctx).map(s => `<button data-copilot-quick="${esc(s)}">${esc(s)}</button>`).join("");
+  const chat = messages.length
+    ? messages.slice(-8).map(m => `<div class="copilot-msg ${m.role === "agent" ? "agent" : "casa"}">${esc(m.text)}</div>`).join("")
+    : `<div class="copilot-msg casa">I'm Casa Copilot. I use the current listing context to help you find next actions, explain terms, review missing fields, and summarize deadlines.</div>`;
+  const contextRows = listing
+    ? `<strong>${esc(listing.property || "Untitled listing")}</strong>
+       <div class="copilot-context-grid">
+         <span>Seller: ${esc(listing.seller || "Unknown")}</span>
+         <span>Status: ${esc(listing.stage || "Unknown")} · ${esc(ctx.phase)}</span>
+         <span>Checklist: ${ctx.progress.done}/${ctx.progress.total} complete</span>
+       </div>
+       <div class="copilot-pill-row" style="margin-top:10px;">
+         <span class="copilot-pill">Context-aware</span><span class="copilot-pill">No legal advice</span>
+       </div>`
+    : `<strong>No listing selected</strong><div class="copilot-context-grid"><span>Open a listing so Casa can use its context.</span></div>`;
+  return `
+    <aside class="copilot ${open ? "" : "collapsed"}" id="casaCopilot" aria-label="Casa Copilot">
+      <div class="copilot-header">
+        <div><div class="copilot-title">Casa Copilot</div><div class="copilot-name">Casa</div></div>
+        <div class="copilot-actions">
+          <button class="copilot-icon-btn copilot-new" id="copilotNewChat" title="New chat">＋</button>
+          <button class="copilot-icon-btn" id="copilotToggle" title="${open ? "Collapse" : "Open"}">${open ? "×" : "Casa"}</button>
+        </div>
+      </div>
+      <div class="copilot-body">
+        <div class="copilot-context"><span>Working on:</span>${contextRows}</div>
+        <div class="copilot-quick"><div class="copilot-quick-title">Ask Casa</div>${suggestions}</div>
+        <div class="copilot-chat">${chat}</div>
+      </div>
+      <div class="copilot-input-wrap">
+        <div class="copilot-input-label">Ask Casa about this transaction…</div>
+        <div class="copilot-input-row">
+          <textarea class="copilot-input" id="copilotInput" placeholder="What does this mean? What am I missing?"></textarea>
+          <button class="copilot-send" id="copilotSend" aria-label="Send to Casa">↑</button>
+        </div>
       </div>
     </aside>`;
 }
@@ -1367,8 +1527,48 @@ function bindEvents() {
   const settingsTeamName = document.getElementById("settingsTeamName");
   if (settingsTeamName) settingsTeamName.addEventListener("change", e => { state.teamName = e.target.value; saveState(); render(); });
 
-  const settingsNotes = document.getElementById("settingsNotes");
-  if (settingsNotes) settingsNotes.addEventListener("change", e => { const listing = currentListing(); if (listing) { listing.notes = e.target.value; saveState(); } });
+  const copilotToggle = document.getElementById("copilotToggle");
+  if (copilotToggle) copilotToggle.addEventListener("click", () => {
+    state.copilot.open = !state.copilot.open;
+    saveState(); render();
+  });
+
+  const copilotMobileFab = document.getElementById("copilotMobileFab");
+  if (copilotMobileFab) copilotMobileFab.addEventListener("click", () => {
+    state.copilot.open = true;
+    saveState(); render();
+  });
+
+  const copilotNewChat = document.getElementById("copilotNewChat");
+  if (copilotNewChat) copilotNewChat.addEventListener("click", () => {
+    state.copilot.messages = [];
+    saveState(); render();
+  });
+
+  function sendCopilotMessage(text) {
+    const prompt = String(text || "").trim();
+    if (!prompt) return;
+    state.copilot.open = true;
+    state.copilot.messages.push({ role: "agent", text: prompt, ts: Date.now() });
+    state.copilot.messages.push({ role: "casa", text: copilotReply(prompt), ts: Date.now() });
+    state.copilot.messages = state.copilot.messages.slice(-30);
+    saveState(); render();
+  }
+
+  const copilotSend = document.getElementById("copilotSend");
+  const copilotInput = document.getElementById("copilotInput");
+  if (copilotSend && copilotInput) {
+    copilotSend.addEventListener("click", () => sendCopilotMessage(copilotInput.value));
+    copilotInput.addEventListener("keydown", e => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault(); sendCopilotMessage(copilotInput.value);
+      }
+    });
+  }
+
+  document.querySelectorAll("[data-copilot-quick]").forEach(el => {
+    el.addEventListener("click", () => sendCopilotMessage(el.getAttribute("data-copilot-quick")));
+  });
 
   document.querySelectorAll("[data-tab]").forEach(el => {
     el.addEventListener("click", () => {
