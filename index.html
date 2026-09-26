@@ -194,8 +194,58 @@
   }
   .sidebar-theme-btn:hover { background: #F4F3F8; color: var(--text); }
 
-  .main { flex: 1; min-width: 0; padding: 34px 40px 88px; }
+  .main { flex: 1; min-width: 0; padding: 0 40px 88px; }
   .main .promo-bar { margin: 0 -40px 0; padding: 12px 40px; }
+
+  /* ======= Casa Copilot right rail ======= */
+  .copilot {
+    width: 372px; flex: 0 0 372px; height: 100vh; position: sticky; top: 0;
+    border-left: 1px solid var(--border); background: var(--surface);
+    display: flex; flex-direction: column; z-index: 25;
+    transition: width .18s ease, flex-basis .18s ease, transform .18s ease;
+  }
+  .copilot.collapsed { width: 64px; flex-basis: 64px; }
+  .copilot-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 18px 16px 12px; border-bottom: 1px solid var(--border);
+  }
+  .copilot-title { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .copilot-name { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 600; color: var(--text); }
+  .copilot-actions { display: flex; gap: 6px; }
+  .copilot-icon-btn { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; border-radius: 10px; background: var(--surface-2); color: var(--text); }
+  .copilot-body { overflow-y: auto; padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+  .copilot-context {
+    border: 1px solid var(--border); background: var(--surface-2); border-radius: 14px;
+    padding: 12px; font-size: 12.5px; color: var(--muted);
+  }
+  .copilot-context strong { display: block; color: var(--text); font-size: 14px; margin: 3px 0; }
+  .copilot-context-grid { display: grid; gap: 4px; margin-top: 8px; }
+  .copilot-pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .copilot-pill { padding: 4px 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 700; }
+  .copilot-quick { display: grid; gap: 8px; }
+  .copilot-quick-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .copilot-quick button { text-align: left; border-radius: 12px; background: var(--surface-2); color: var(--text); padding: 10px 12px; font-size: 13px; }
+  .copilot-quick button:hover { background: var(--accent-soft); color: var(--accent); }
+  .copilot-chat { display: grid; gap: 10px; }
+  .copilot-msg { max-width: 92%; border-radius: 14px; padding: 10px 12px; font-size: 13px; line-height: 1.45; white-space: pre-wrap; }
+  .copilot-msg.casa { background: var(--surface-2); color: var(--text); justify-self: start; }
+  .copilot-msg.agent { background: var(--accent); color: #fff; justify-self: end; }
+  .copilot-input-wrap { border-top: 1px solid var(--border); padding: 12px; background: var(--surface); }
+  .copilot-input-label { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .copilot-input-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+  .copilot-input {
+    width: 100%; min-height: 42px; max-height: 120px; resize: vertical;
+    border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
+    font: inherit; font-size: 13px; background: var(--surface-2); color: var(--text);
+  }
+  .copilot-send { width: 42px; height: 42px; padding: 0; border-radius: 14px; background: var(--accent); color: #fff; }
+  .copilot.collapsed .copilot-body,
+  .copilot.collapsed .copilot-input-wrap,
+  .copilot.collapsed .copilot-title,
+  .copilot.collapsed .copilot-name,
+  .copilot.collapsed .copilot-actions .copilot-new { display: none; }
+  .copilot.collapsed .copilot-header { justify-content: center; padding: 14px 8px; border-bottom: none; }
+  .copilot-mobile-fab { display: none; }
 
   .content-topbar { display: flex; align-items: center; padding: 0 0 8px; margin-bottom: 0; }
   .hamburger-btn {
@@ -216,9 +266,24 @@
       transform: translateX(-100%); z-index: 40; height: 100dvh;
     }
     .sidebar.open { transform: translateX(0); box-shadow: 4px 0 32px rgba(35,35,56,0.18); }
-    .main { padding: 20px 18px 88px; }
+    .main { padding: 0 18px 88px; }
     .main .promo-bar { margin: 0 -18px 0; padding: 12px 18px; }
     .hamburger-btn { display: flex; }
+    .copilot {
+      position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+      width: 100%; height: min(78vh, 680px); flex-basis: auto;
+      border-left: none; border-top: 1px solid var(--border);
+      border-radius: 18px 18px 0 0;
+      transform: translateY(110%); z-index: 45;
+      box-shadow: 0 -12px 38px rgba(35,35,56,.18);
+    }
+    .copilot:not(.collapsed) { transform: translateY(0); }
+    .copilot.collapsed { width: 100%; flex-basis: auto; transform: translateY(110%); }
+    .copilot.collapsed .copilot-header { display: none; }
+    .copilot-mobile-fab {
+      display: block; position: fixed; right: 16px; bottom: 78px; z-index: 44;
+      background: var(--accent); color: #fff; box-shadow: 0 8px 22px rgba(124,95,196,.26);
+    }
   }
 
 
@@ -470,6 +535,34 @@
   .timeline-date { color: var(--muted); font-size: 13px; margin-top: 2px; }
   .vendor-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end; margin-top: 10px; }
 
+  /* Documents page */
+  .documents-head { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .documents-head h2 { font-size: 28px; color: var(--heading); }
+  .documents-sub { color: var(--muted); font-size: 13.5px; margin-top: 4px; max-width: 720px; }
+  .state-pill { background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 800; }
+  .doc-category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .doc-category-tab { background: var(--surface-2); color: var(--muted); border: 1px solid transparent; }
+  .doc-category-tab.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .doc-grid { display: grid; gap: 12px; }
+  .doc-card { overflow: hidden; }
+  .doc-card-summary { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 16px 18px; text-align: left; background: var(--surface); color: var(--text); border-radius: var(--radius); }
+  .doc-card-summary:hover { background: var(--surface-2); }
+  .doc-title { font-size: 16px; font-weight: 800; color: var(--text); }
+  .doc-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+  .doc-meta .tag { background: var(--surface-2); color: var(--muted); }
+  .doc-purpose { color: var(--muted); font-size: 13px; margin-top: 8px; max-width: 850px; }
+  .doc-chevron { color: var(--muted); font-weight: 800; }
+  .doc-card.open .doc-chevron { transform: rotate(180deg); }
+  .doc-card-body { border-top: 1px solid var(--border); padding: 18px; display: grid; gap: 16px; }
+  .doc-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .doc-info-box { background: var(--surface-2); border-radius: 12px; padding: 12px; }
+  .doc-info-box h4 { margin: 0 0 7px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .doc-info-box p, .doc-info-box li { font-size: 13px; color: var(--text); margin: 0; }
+  .doc-info-box ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  .doc-questions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .doc-questions button { background: var(--accent-soft); color: var(--accent); font-size: 12px; }
+  .doc-guardrail { color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+
   @media (max-width: 780px) {
     .nav-links span:not(:last-child) { display: none; }
     .kanban-board { grid-template-columns: repeat(2, 1fr); }
@@ -485,9 +578,10 @@
     .progress-wrap { min-width: 0; }
     .desktop-only { display: none; }
     .vendor-row { grid-template-columns: 1fr; }
+    .doc-info-grid { grid-template-columns: 1fr; }
     .mobile-bottom-tabs {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
       padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
       background: rgba(var(--surface-rgb),.94); border-top: 1px solid var(--border); box-shadow: var(--shadow);
     }
@@ -836,6 +930,65 @@ function sampleListings() {
 
 const PHASES = ["Prep", "MLS Live", "Showings/Offers", "Pending/Close"];
 const DETAIL_TABS = ["Prep", "Scheduling", "MLS Live", "Showings/Offers", "Pending/Close", "Notes"];
+const DOC_CATEGORIES = ["Buyer Offer", "Listing", "Disclosures", "Financing", "Inspection", "Closing"];
+const DOCUMENT_LIBRARY = [
+  {
+    id: "wa_form_21", state: "Washington", category: "Buyer Offer", name: "Residential Purchase & Sale Agreement", shortName: "Form 21",
+    purpose: "The main agreement used to write a residential buyer offer and establish price, closing, possession, title, contingencies, and core deadlines.",
+    usedWhen: "A buyer is making an offer on a Washington residential property.",
+    needs: ["Buyer and seller names", "Property address and legal description", "Purchase price", "Earnest money", "Closing date", "Possession terms", "Included/excluded items", "Selected addenda"],
+    keySections: ["Purchase price", "Earnest money", "Title and escrow", "Closing date", "Possession", "Addenda and contingencies"],
+    watchOut: ["Missing legal description", "Unclear possession timing", "Unchecked addenda that should apply", "Deadlines entered without confirming contract terms"],
+  },
+  {
+    id: "wa_financing_addendum", state: "Washington", category: "Financing", name: "Financing Addendum", shortName: "Financing",
+    purpose: "Explains how the buyer intends to finance the purchase and which financing protections or requirements apply.",
+    usedWhen: "The buyer is not paying all cash and the offer depends on loan approval or financing terms.",
+    needs: ["Loan type", "Down payment", "Financing timeline", "Lender details", "Any appraisal or loan-condition deadlines"],
+    keySections: ["Loan type", "Buyer financing duties", "Appraisal-related language", "Financing contingency deadlines"],
+    watchOut: ["Wrong loan type", "Missing lender timeline", "Assuming appraisal protection applies without reviewing the form"],
+  },
+  {
+    id: "wa_inspection_addendum", state: "Washington", category: "Inspection", name: "Inspection Addendum", shortName: "Inspection",
+    purpose: "Creates the buyer's inspection rights and sets expectations for inspection review, negotiations, and deadlines.",
+    usedWhen: "The buyer wants an inspection contingency or inspection-related negotiation rights.",
+    needs: ["Inspection contingency decision", "Inspection deadline", "Requested inspection types", "Buyer response timeline"],
+    keySections: ["Inspection period", "Response options", "Seller response", "Additional inspections"],
+    watchOut: ["Deadline not tracked", "Inspection waived unintentionally", "Confusing inspection response with seller disclosure review"],
+  },
+  {
+    id: "wa_seller_disclosure", state: "Washington", category: "Disclosures", name: "Seller Disclosure Statement", shortName: "Form 17",
+    purpose: "Seller-provided disclosures about property condition, systems, title matters, environmental issues, and known defects.",
+    usedWhen: "Most Washington residential sales unless an exemption applies.",
+    needs: ["Seller-completed responses", "Delivery date", "Buyer review/response deadline", "Any known issue follow-up"],
+    keySections: ["Title", "Water/sewer", "Structural", "Systems", "Environmental", "HOA/condo items"],
+    watchOut: ["Incomplete seller answers", "Missed buyer review deadline", "Treating disclosure as a warranty instead of seller disclosure"],
+  },
+  {
+    id: "wa_lead_disclosure", state: "Washington", category: "Disclosures", name: "Lead-Based Paint Disclosure", shortName: "Lead Paint",
+    purpose: "Federal disclosure workflow for homes built before 1978 regarding known lead-based paint hazards and buyer acknowledgement.",
+    usedWhen: "Residential property was built before 1978 unless an exemption applies.",
+    needs: ["Year built", "Seller lead-paint knowledge", "Records/reports availability", "Buyer acknowledgement", "Agent acknowledgements"],
+    keySections: ["Seller disclosure", "Buyer acknowledgement", "Agent certification", "Records/reports"],
+    watchOut: ["Not checking year built", "Missing signatures/acknowledgements", "Assuming lead disclosure is optional for pre-1978 homes"],
+  },
+  {
+    id: "wa_listing_agreement", state: "Washington", category: "Listing", name: "Listing Agreement", shortName: "Form 1A",
+    purpose: "Authorizes the brokerage to list and market the seller's property and defines listing terms, compensation, duration, and seller obligations.",
+    usedWhen: "Before taking a seller's residential property to market.",
+    needs: ["Seller names", "Property address/legal description", "List price", "Listing start/end dates", "Commission/compensation terms", "Included/excluded items"],
+    keySections: ["Listing term", "Price", "Brokerage authorization", "Compensation", "Seller representations", "Marketing permissions"],
+    watchOut: ["Wrong owner names", "Missing expiration date", "Compensation terms not confirmed", "Listing before required disclosures are complete"],
+  },
+  {
+    id: "wa_title_escrow", state: "Washington", category: "Closing", name: "Title & Escrow Instructions", shortName: "Title/Escrow",
+    purpose: "Coordinates title review, escrow handling, closing logistics, and final file requirements.",
+    usedWhen: "After mutual acceptance and throughout pending-to-close workflow.",
+    needs: ["Title company", "Escrow contact", "Closing date", "Buyer/seller contact info", "Payoff or lien details if applicable"],
+    keySections: ["Title review", "Escrow instructions", "Closing date", "Funds and payoff coordination", "Final documents"],
+    watchOut: ["Title exceptions not reviewed", "Escrow contact missing", "Closing reminders not sent", "Final file audit skipped"],
+  },
+];
 const PHASE_BG = { "Prep": "pastel-blue", "MLS Live": "pastel-yellow", "Showings/Offers": "pastel-pink", "Pending/Close": "pastel-green" };
 const PHASE_SECTIONS = {
   "Prep": ["Pre-Listing Documents"],
@@ -905,12 +1058,19 @@ function migrateState(rawState) {
   if (!next.teamName || next.teamName === "Your Real Estate Business") next.teamName = "Casa";
   if (next.theme !== "light" && next.theme !== "dark") next.theme = "light";
   if (!next.view || !next.view.screen) next.view = { screen: "dashboard", listingId: null };
+  if (!next.copilot || typeof next.copilot !== "object") {
+    next.copilot = { open: true, messages: [] };
+  }
+  if (typeof next.copilot.open !== "boolean") next.copilot.open = true;
+  if (!Array.isArray(next.copilot.messages)) next.copilot.messages = [];
   if (!PHASES.includes(next.view.dashboardPhase)) {
     next.view.dashboardPhase = PHASES.includes(next.view.phase) ? next.view.phase : "Prep";
   }
   if (!DETAIL_TABS.includes(next.view.detailPhase)) {
     next.view.detailPhase = "Prep";
   }
+  if (!DOC_CATEGORIES.includes(next.view.docCategory)) next.view.docCategory = "Buyer Offer";
+  if (!Array.isArray(next.view.openDocs)) next.view.openDocs = ["wa_form_21"];
   const sectionNames = (CHECKLIST_TEMPLATE || []).map(s => s.section);
   if (!sectionNames.includes(next.view.checklistSection)) {
     next.view.checklistSection = sectionNames[0] || null;
@@ -974,6 +1134,8 @@ function render() {
     content = renderChecklistScreen(state.listings.find(l => l.id === state.view.listingId));
   } else if (state.view.screen === "timeline") {
     content = renderTimeline(state.listings.find(l => l.id === state.view.listingId));
+  } else if (state.view.screen === "documents") {
+    content = renderDocuments();
   } else if (state.view.screen === "settings") {
     content = renderSettings();
   } else {
@@ -985,7 +1147,9 @@ function render() {
       <div class="main" id="mainContent">
         ${content}
       </div>
+      ${renderCopilot()}
     </div>
+    <button class="copilot-mobile-fab" id="copilotMobileFab">Casa</button>
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>`;
   bindEvents();
 }
@@ -1008,6 +1172,8 @@ function renderSidebar() {
       svg: `<svg viewBox="0 0 20 20" stroke="currentColor" fill="none" stroke-width="1.6"><path d="M4 6l1.6 1.6L8 5M4 10.5l1.6 1.6 2.4-2.6M4 15l1.6 1.6 2.4-2.6M11 6h5M11 10.5h5M11 15h5"/></svg>` },
     { tab: "timeline", active: screen === "timeline", label: "Timeline",
       svg: `<svg viewBox="0 0 20 20" stroke="currentColor" fill="none" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12" rx="1.5"/><path d="M3 8.5h14M7 3v3M13 3v3"/></svg>` },
+    { tab: "documents", active: screen === "documents", label: "Documents",
+      svg: `<svg viewBox="0 0 20 20" stroke="currentColor" fill="none" stroke-width="1.6"><path d="M5 3.5h7l3 3V16a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 5 16V3.5Z"/><path d="M12 3.5V7h3M7.5 10h5M7.5 13h5"/></svg>` },
     { tab: "settings", active: screen === "settings", label: "Settings",
       svg: `<svg viewBox="0 0 20 20" stroke="currentColor" fill="none" stroke-width="1.6"><circle cx="10" cy="10" r="2.6"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5.3 5.3l1.4 1.4M13.3 13.3l1.4 1.4M5.3 14.7l1.4-1.4M13.3 6.7l1.4-1.4"/></svg>` },
   ];
@@ -1034,6 +1200,99 @@ function renderSidebar() {
           <span class="s-icon">${themeIcon}</span>
           <span>${state.theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
         </button>
+      </div>
+    </aside>`;
+}
+
+function copilotContext() {
+  const listing = currentListing() || state.listings[0] || null;
+  const screen = state.view.screen || "dashboard";
+  const phase = listing ? listingPhase(listing) : "No listing selected";
+  const p = listing ? progress(listing) : null;
+  return { listing, screen, phase, progress: p };
+}
+
+function copilotSuggestions(ctx) {
+  if (ctx.screen === "detail") return ["What should I do next?", "Review this listing", "What am I missing?", "Explain earnest money"];
+  if (ctx.screen === "checklist") return ["Review my checklist", "What is incomplete?", "Which items are urgent?", "Prepare listing documents"];
+  if (ctx.screen === "timeline") return ["What's due next?", "Show upcoming deadlines", "Explain mutual acceptance", "Review closing timeline"];
+  if (ctx.screen === "documents") return ["Which form starts a buyer offer?", "Explain Form 21", "What documents need deadlines?", "What should a new agent watch out for?"];
+  if (ctx.screen === "settings") return ["Review vendor coverage", "What vendors are missing?", "Explain transaction coordinator", "Help organize this file"];
+  return ["What should I do next?", "Which listings need attention?", "Show upcoming deadlines", "Review listing readiness"];
+}
+
+function copilotReply(prompt) {
+  const ctx = copilotContext();
+  const listing = ctx.listing;
+  const lower = prompt.toLowerCase();
+  if (!listing) return "I don't have a listing selected yet. Open or create a listing so I can use its context.";
+  const openTasks = listing.checklist.filter(t => !t.done);
+  const highOpen = openTasks.filter(t => t.priority === "High");
+  const dates = [
+    ["Go-Live", listing.goLive], ["Open House #1", listing.openHouse1], ["Open House #2", listing.openHouse2],
+    ["Mutual Acceptance", listing.mutualAcceptance], ["Appraisal", listing.appraisalDate], ["Closing", listing.closingDate],
+  ].filter(([, d]) => d);
+  if (lower.includes("missing") || lower.includes("incomplete") || lower.includes("review")) {
+    return `For ${listing.property}, I see ${openTasks.length} open checklist items. ${highOpen.length ? `${highOpen.length} are high priority: ${highOpen.slice(0, 4).map(t => t.name).join("; ")}.` : "No high-priority checklist items are currently open."}\n\nGuardrail: confirm contract/document decisions with your managing broker when the source file is incomplete.`;
+  }
+  if (lower.includes("due") || lower.includes("deadline") || lower.includes("timeline")) {
+    return dates.length
+      ? `Tracked dates for ${listing.property}:\n${dates.map(([name, date]) => `• ${name}: ${date}`).join("\n")}\n\nI can only use dates already stored in Casa; I won't infer contract deadlines without the transaction inputs.`
+      : `I don't see any timeline dates stored for ${listing.property} yet. Add go-live, open house, mutual acceptance, appraisal, or closing dates first.`;
+  }
+  if (lower.includes("earnest money")) {
+    return "Earnest money is money the buyer deposits after an offer is accepted to show they intend to complete the purchase. The purchase agreement controls when it must be deposited, who holds it, and what happens if the transaction does not close.";
+  }
+  const doc = DOCUMENT_LIBRARY.find(d => lower.includes(d.shortName.toLowerCase()) || lower.includes(d.name.toLowerCase().split(" ")[0]) || lower.includes(d.category.toLowerCase()));
+  if (doc) {
+    return `${doc.shortName}: ${doc.purpose}\n\nUsed when: ${doc.usedWhen}\n\nInformation needed: ${doc.needs.slice(0, 5).join("; ")}.\n\nWatch out: ${doc.watchOut.slice(0, 3).join("; ")}.\n\nCasa can explain workflow and common fields, but confirm transaction-specific questions with your managing broker or attorney.`;
+  }
+  if (lower.includes("form") || lower.includes("document") || lower.includes("offer")) {
+    return "V1 document guidance is scaffolded only. Recommended next step: build a Washington Residential Buyer Offer transaction object, then map supported fields to document definitions. Casa should validate structured data before any document is generated — not let AI directly edit PDFs.";
+  }
+  return `I'm looking at ${listing.property} (${ctx.phase}). Next practical step: handle the highest-priority open checklist item: ${highOpen[0]?.name || openTasks[0]?.name || "the listing looks complete in the current checklist"}.`;
+}
+
+function renderCopilot() {
+  const ctx = copilotContext();
+  const listing = ctx.listing;
+  const open = state.copilot?.open !== false;
+  const messages = state.copilot?.messages || [];
+  const suggestions = copilotSuggestions(ctx).map(s => `<button data-copilot-quick="${esc(s)}">${esc(s)}</button>`).join("");
+  const chat = messages.length
+    ? messages.slice(-8).map(m => `<div class="copilot-msg ${m.role === "agent" ? "agent" : "casa"}">${esc(m.text)}</div>`).join("")
+    : `<div class="copilot-msg casa">I'm Casa Copilot. I use the current listing context to help you find next actions, explain terms, review missing fields, and summarize deadlines.</div>`;
+  const contextRows = listing
+    ? `<strong>${esc(listing.property || "Untitled listing")}</strong>
+       <div class="copilot-context-grid">
+         <span>Seller: ${esc(listing.seller || "Unknown")}</span>
+         <span>Status: ${esc(listing.stage || "Unknown")} · ${esc(ctx.phase)}</span>
+         <span>Checklist: ${ctx.progress.done}/${ctx.progress.total} complete</span>
+       </div>
+       <div class="copilot-pill-row" style="margin-top:10px;">
+         <span class="copilot-pill">Context-aware</span><span class="copilot-pill">No legal advice</span>
+       </div>`
+    : `<strong>No listing selected</strong><div class="copilot-context-grid"><span>Open a listing so Casa can use its context.</span></div>`;
+  return `
+    <aside class="copilot ${open ? "" : "collapsed"}" id="casaCopilot" aria-label="Casa Copilot">
+      <div class="copilot-header">
+        <div><div class="copilot-title">Casa Copilot</div><div class="copilot-name">Casa</div></div>
+        <div class="copilot-actions">
+          <button class="copilot-icon-btn copilot-new" id="copilotNewChat" title="New chat">＋</button>
+          <button class="copilot-icon-btn" id="copilotToggle" title="${open ? "Collapse" : "Open"}">${open ? "×" : "Casa"}</button>
+        </div>
+      </div>
+      <div class="copilot-body">
+        <div class="copilot-context"><span>Working on:</span>${contextRows}</div>
+        <div class="copilot-quick"><div class="copilot-quick-title">Ask Casa</div>${suggestions}</div>
+        <div class="copilot-chat">${chat}</div>
+      </div>
+      <div class="copilot-input-wrap">
+        <div class="copilot-input-label">Ask Casa about this transaction…</div>
+        <div class="copilot-input-row">
+          <textarea class="copilot-input" id="copilotInput" placeholder="What does this mean? What am I missing?"></textarea>
+          <button class="copilot-send" id="copilotSend" aria-label="Send to Casa">↑</button>
+        </div>
       </div>
     </aside>`;
 }
@@ -1124,6 +1383,7 @@ function renderBottomTabs() {
       <button class="tab-btn ${active === "dashboard" ? "active" : ""}" data-tab="dashboard"><strong>▦</strong>Dashboard</button>
       <button class="tab-btn ${active === "checklist" ? "active" : ""}" data-tab="checklist"><strong>✓</strong>Checklist</button>
       <button class="tab-btn ${active === "timeline" ? "active" : ""}" data-tab="timeline"><strong>◷</strong>Timeline</button>
+      <button class="tab-btn ${active === "documents" ? "active" : ""}" data-tab="documents"><strong>□</strong>Docs</button>
       <button class="tab-btn ${active === "settings" ? "active" : ""}" data-tab="settings"><strong>⚙</strong>Settings</button>
     </nav>`;
 }
@@ -1298,6 +1558,60 @@ function renderTimeline(listing) {
   `;
 }
 
+function renderDocuments() {
+  const activeCat = DOC_CATEGORIES.includes(state.view.docCategory) ? state.view.docCategory : "Buyer Offer";
+  const openDocs = Array.isArray(state.view.openDocs) ? state.view.openDocs : [];
+  const cats = DOC_CATEGORIES.map(cat => {
+    const count = DOCUMENT_LIBRARY.filter(d => d.category === cat).length;
+    return `<button class="doc-category-tab ${cat === activeCat ? "active" : ""}" data-doc-category="${esc(cat)}">${esc(cat)} <span class="phase-tab-count">${count}</span></button>`;
+  }).join("");
+  const docs = DOCUMENT_LIBRARY.filter(d => d.category === activeCat);
+  const cards = docs.map(doc => {
+    const isOpen = openDocs.includes(doc.id);
+    const list = arr => `<ul>${arr.map(item => `<li>${esc(item)}</li>`).join("")}</ul>`;
+    return `
+      <div class="card doc-card ${isOpen ? "open" : ""}">
+        <button class="doc-card-summary" data-doc-toggle="${esc(doc.id)}" aria-expanded="${isOpen ? "true" : "false"}">
+          <div>
+            <div class="doc-title">${esc(doc.name)}</div>
+            <div class="doc-meta"><span class="tag">${esc(doc.shortName)}</span><span class="tag">${esc(doc.state)}</span><span class="tag">${esc(doc.category)}</span></div>
+            <div class="doc-purpose">${esc(doc.purpose)}</div>
+          </div>
+          <div class="doc-chevron">⌄</div>
+        </button>
+        ${isOpen ? `
+          <div class="doc-card-body">
+            <div class="doc-info-grid">
+              <div class="doc-info-box"><h4>When to use it</h4><p>${esc(doc.usedWhen)}</p></div>
+              <div class="doc-info-box"><h4>Info you'll need</h4>${list(doc.needs)}</div>
+              <div class="doc-info-box"><h4>Key sections</h4>${list(doc.keySections)}</div>
+              <div class="doc-info-box"><h4>Watch out for</h4>${list(doc.watchOut)}</div>
+            </div>
+            <div class="doc-questions">
+              <button data-doc-question="What is ${esc(doc.shortName)} used for?">What is this for?</button>
+              <button data-doc-question="What information do I need for ${esc(doc.shortName)}?">What info do I need?</button>
+              <button data-doc-question="What are the risky sections in ${esc(doc.shortName)}?">Risky sections</button>
+              <button data-doc-question="Explain ${esc(doc.shortName)} simply">Explain simply</button>
+            </div>
+            <div class="doc-guardrail">Casa explains document workflow and common fields, but does not provide legal advice. Confirm transaction-specific questions with your managing broker or attorney.</div>
+          </div>` : ""}
+      </div>`;
+  }).join("");
+  return `
+    ${renderTopbar()}
+    <div class="documents-head">
+      <div>
+        <h2>Documents</h2>
+        <div class="documents-sub">Browse Washington residential transaction documents. Expand a card to learn what it is for, when to use it, what information you need, and what to watch out for.</div>
+      </div>
+      <div class="state-pill">State: Washington</div>
+    </div>
+    <div class="doc-category-tabs" aria-label="Document categories">${cats}</div>
+    <div class="doc-grid">${cards}</div>
+    ${renderBottomTabs()}
+  `;
+}
+
 function renderSettings() {
   const listing = currentListing() || state.listings[0] || null;
   if (listing && !currentListing()) state.view.listingId = listing.id;
@@ -1367,8 +1681,71 @@ function bindEvents() {
   const settingsTeamName = document.getElementById("settingsTeamName");
   if (settingsTeamName) settingsTeamName.addEventListener("change", e => { state.teamName = e.target.value; saveState(); render(); });
 
-  const settingsNotes = document.getElementById("settingsNotes");
-  if (settingsNotes) settingsNotes.addEventListener("change", e => { const listing = currentListing(); if (listing) { listing.notes = e.target.value; saveState(); } });
+  const copilotToggle = document.getElementById("copilotToggle");
+  if (copilotToggle) copilotToggle.addEventListener("click", () => {
+    state.copilot.open = !state.copilot.open;
+    saveState(); render();
+  });
+
+  const copilotMobileFab = document.getElementById("copilotMobileFab");
+  if (copilotMobileFab) copilotMobileFab.addEventListener("click", () => {
+    state.copilot.open = true;
+    saveState(); render();
+  });
+
+  const copilotNewChat = document.getElementById("copilotNewChat");
+  if (copilotNewChat) copilotNewChat.addEventListener("click", () => {
+    state.copilot.messages = [];
+    saveState(); render();
+  });
+
+  function sendCopilotMessage(text) {
+    const prompt = String(text || "").trim();
+    if (!prompt) return;
+    state.copilot.open = true;
+    state.copilot.messages.push({ role: "agent", text: prompt, ts: Date.now() });
+    state.copilot.messages.push({ role: "casa", text: copilotReply(prompt), ts: Date.now() });
+    state.copilot.messages = state.copilot.messages.slice(-30);
+    saveState(); render();
+  }
+
+  const copilotSend = document.getElementById("copilotSend");
+  const copilotInput = document.getElementById("copilotInput");
+  if (copilotSend && copilotInput) {
+    copilotSend.addEventListener("click", () => sendCopilotMessage(copilotInput.value));
+    copilotInput.addEventListener("keydown", e => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault(); sendCopilotMessage(copilotInput.value);
+      }
+    });
+  }
+
+  document.querySelectorAll("[data-copilot-quick]").forEach(el => {
+    el.addEventListener("click", () => sendCopilotMessage(el.getAttribute("data-copilot-quick")));
+  });
+
+  document.querySelectorAll("[data-doc-question]").forEach(el => {
+    el.addEventListener("click", () => sendCopilotMessage(el.getAttribute("data-doc-question")));
+  });
+
+  document.querySelectorAll("[data-doc-category]").forEach(el => {
+    el.addEventListener("click", () => {
+      state.view.docCategory = el.getAttribute("data-doc-category");
+      const firstDoc = DOCUMENT_LIBRARY.find(d => d.category === state.view.docCategory);
+      state.view.openDocs = firstDoc ? [firstDoc.id] : [];
+      saveState(); render();
+    });
+  });
+
+  document.querySelectorAll("[data-doc-toggle]").forEach(el => {
+    el.addEventListener("click", () => {
+      const docId = el.getAttribute("data-doc-toggle");
+      const openDocs = new Set(Array.isArray(state.view.openDocs) ? state.view.openDocs : []);
+      if (openDocs.has(docId)) openDocs.delete(docId); else openDocs.add(docId);
+      state.view.openDocs = [...openDocs];
+      saveState(); render();
+    });
+  });
 
   document.querySelectorAll("[data-tab]").forEach(el => {
     el.addEventListener("click", () => {
